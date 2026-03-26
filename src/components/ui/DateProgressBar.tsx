@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { formatDate } from "@/lib/utils";
 
 interface DateProgressBarProps {
@@ -7,6 +8,12 @@ interface DateProgressBarProps {
 }
 
 export const DateProgressBar = ({ startDate, dueDate, showBothDates = false }: DateProgressBarProps) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   if (!startDate || !dueDate) {
     return (
       <span className="text-text-primary text-sm font-medium">
@@ -17,7 +24,7 @@ export const DateProgressBar = ({ startDate, dueDate, showBothDates = false }: D
   
   const start = new Date(startDate).getTime();
   const due = new Date(dueDate).getTime();
-  const today = new Date().getTime();
+  const today = mounted ? new Date().getTime() : start;
   
   if (due <= start) {
     return (

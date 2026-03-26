@@ -170,7 +170,11 @@ export default function UserDetails() {
             {userProjects.map(project => (
               <Link key={project.id} href={`/projects/${project.id}`}>
                 <Card className="p-4 flex items-center gap-3 hover:border-primary transition-colors cursor-pointer group">
-                  <div className="w-10 h-10 rounded bg-page-bg flex items-center justify-center text-xl shrink-0">📁</div>
+                  {project.avatarUrl ? (
+                    <img src={project.avatarUrl} alt={project.name} className="w-10 h-10 rounded-md object-contain p-1.5 shadow-sm shrink-0" style={{ backgroundColor: project.themeColor || '#1e293b' }} />
+                  ) : (
+                    <div className="w-10 h-10 rounded-md bg-page-bg flex items-center justify-center text-xl shrink-0 shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] border border-transparent" style={{ borderBottomColor: project.themeColor, borderBottomWidth: "3px" }}>📁</div>
+                  )}
                   <div className="flex flex-col truncate">
                     <span className="font-medium text-text-primary truncate group-hover:text-primary transition-colors">{project.name}</span>
                     <span className="text-xs text-text-secondary">{project.status}</span>
@@ -224,7 +228,7 @@ export default function UserDetails() {
 
       {/* EDIT PROFILE MODAL */}
       {isEditOpen && (
-        <div className="fixed inset-0 bg-secondary/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-secondary/20 flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-border-color">
             <div className="flex justify-between items-center p-4 border-b border-border-color bg-page-bg">
               <h3 className="font-bold text-lg text-text-primary">Edit Profile</h3>
