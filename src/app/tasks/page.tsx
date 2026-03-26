@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/Badge";
@@ -14,7 +14,7 @@ import { Task, TaskStatus, TaskPriority } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { DateProgressBar } from "@/components/ui/DateProgressBar";
 
-export default function TasksList() {
+function TasksListContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialProject = searchParams.get("project") || "All";
@@ -577,5 +577,13 @@ export default function TasksList() {
         </div>
       </Modal>
     </div>
+  );
+}
+
+export default function TasksPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-12 text-text-secondary">Loading tasks...</div>}>
+      <TasksListContent />
+    </Suspense>
   );
 }
