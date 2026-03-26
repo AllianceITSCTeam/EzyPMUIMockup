@@ -13,6 +13,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea
 import { Task, TaskStatus, TaskPriority } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { DateProgressBar } from "@/components/ui/DateProgressBar";
+import { CreateTaskModal } from "@/components/ui/CreateTaskModal";
 
 function TasksListContent() {
   const router = useRouter();
@@ -67,17 +68,6 @@ function TasksListContent() {
     saveColumnConfig(newCols, hiddenColumns);
   };
   
-  // Form State
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskDesc, setNewTaskDesc] = useState("");
-  const [newTaskPriority, setNewTaskPriority] = useState<TaskPriority>("Medium");
-  const [newTaskEst, setNewTaskEst] = useState("");
-  const [newTaskAssignee, setNewTaskAssignee] = useState("");
-  const [newTaskProject, setNewTaskProject] = useState("");
-  const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus>("To Do");
-  const [newTaskStartDate, setNewTaskStartDate] = useState(new Date().toISOString().split("T")[0]);
-  const [newTaskDueDate, setNewTaskDueDate] = useState("");
-
   // Filter State
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -133,32 +123,6 @@ function TasksListContent() {
     { value: "All", label: "Status: All", icon: <KanbanSquare className="w-4 h-4 text-text-secondary" /> },
     ...taskStatuses.map(s => ({ value: s.name, label: s.name, icon: getStatusIcon(s.name) }))
   ];
-
-  const handleCreateTask = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTaskTitle.trim()) return;
-    
-    const newTask: Task = {
-      id: `t-${Date.now()}`,
-      projectId: newTaskProject || projects[0]?.id || "p1",
-      title: newTaskTitle,
-      description: newTaskDesc,
-      status: newTaskStatus,
-      priority: newTaskPriority,
-      assigneeId: newTaskAssignee || null,
-      estimateHours: Number(newTaskEst) || 0,
-      actualHours: 0,
-      startDate: newTaskStartDate || new Date().toISOString().split("T")[0],
-      dueDate: newTaskDueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-    };
-
-    addTask(newTask);
-    logActivity(`Created new task: ${newTaskTitle}`);
-    addToast("success", `Task "${newTaskTitle}" created successfully`);
-    setNewTaskTitle(""); setNewTaskDesc(""); setNewTaskEst(""); setNewTaskAssignee("");
-    setNewTaskProject(""); setNewTaskStatus("To Do"); setNewTaskDueDate("");
-    setIsModalOpen(false);
-  };
 
   const handleMyTasks = () => {
     setAssigneeFilter(currentUser?.id || "u1");
@@ -440,101 +404,7 @@ function TasksListContent() {
       )}
 
       {/* CREATE TASK MODAL */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Task">
-        <form onSubmit={handleCreateTask} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-text-primary">Task Title <span className="text-danger">*</span></label>
-            <input 
-              type="text" required value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)}
-              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
-              placeholder="e.g. Design Login Screen"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-text-primary">Description</label>
-            <textarea 
-              rows={3} value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)}
-              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary resize-none"
-              placeholder="Brief overview of the task requirements"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-primary">Project <span className="text-danger">*</span></label>
-              <CustomSelect 
-                value={newTaskProject} 
-                onChange={(val: any) => setNewTaskProject(val)}
-                options={[
-                  { value: "", label: "Select project..." },
-                  ...projects.map(p => ({ value: p.id, label: p.name }))
-                ]}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-primary">Status <span className="text-danger">*</span></label>
-              <CustomSelect 
-                value={newTaskStatus} 
-                onChange={(val: any) => setNewTaskStatus(val)}
-                options={taskStatuses.map(s => ({ value: s.name, label: s.name }))}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-primary">Priority</label>
-              <CustomSelect 
-                value={newTaskPriority} 
-                onChange={(val: any) => setNewTaskPriority(val)}
-                options={taskPriorities.map(p => ({ value: p.name, label: p.name }))}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-primary">Estimate (Hours)</label>
-              <input 
-                type="number" min="0" value={newTaskEst} onChange={e => setNewTaskEst(e.target.value)}
-                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
-                placeholder="e.g. 8"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-primary">Start Date *</label>
-              <input 
-                type="date" required value={newTaskStartDate} onChange={e => setNewTaskStartDate(e.target.value)}
-                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-text-primary">Due Date</label>
-              <input 
-                type="date" value={newTaskDueDate} onChange={e => setNewTaskDueDate(e.target.value)}
-                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-text-primary">Assignee</label>
-            <CustomSelect 
-              value={newTaskAssignee} 
-              onChange={(val: any) => setNewTaskAssignee(val)}
-              options={[
-                { value: "", label: "Unassigned" },
-                ...users.map(u => ({ value: u.id, label: u.name }))
-              ]}
-            />
-          </div>
-          
-          <div className="mt-6 flex justify-end gap-3">
-            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
-              Cancel
-            </button>
-            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
-              Create Task
-            </button>
-          </div>
-        </form>
-      </Modal>
+      <CreateTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {/* CONFIGURE BOARD MODAL */}
       <Modal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} title="Configure Kanban Board">

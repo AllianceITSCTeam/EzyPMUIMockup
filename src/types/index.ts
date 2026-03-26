@@ -22,6 +22,10 @@ export interface ProjectStakeholder {
   role: string; // e.g. Client, Sponsor, IT Service
   isCustom?: boolean;
 }
+export interface ProjectResource {
+  userId: string;
+  role: string; // e.g. FE, BE, QC, BA, PM, Fullstack
+}
 
 export interface Project {
   id: string;
@@ -37,7 +41,8 @@ export interface Project {
   progressPercentage: number;
   resourceCount: number;
   taskCount: number;
-  userIds?: string[];
+  userIds?: string[]; // @deprecated Use resources instead
+  resources?: ProjectResource[];
   stakeholders?: ProjectStakeholder[];
   themeColor?: string;
   avatarUrl?: string;

@@ -14,17 +14,19 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { SkillTag } from "@/components/ui/SkillTag";
 import { formatDate } from "@/lib/utils";
-import { ChevronRight, ArrowLeft, Pencil, Users, LayoutList, Share2, Plus, FileText, X, Search, Trash2, Building2, Landmark, Crown, Store, Headset, Handshake, Info, CheckCircle2 } from "lucide-react";
+import { CreateTaskModal } from "@/components/ui/CreateTaskModal";
+import { ChevronRight, ArrowLeft, Pencil, Users, LayoutList, Share2, Plus, FileText, X, Search, Trash2, Building2, Landmark, Crown, Store, Headset, Handshake, Info, CheckCircle2, BarChart2, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 export default function ProjectDetails() {
   const router = useRouter();
   const params = useParams();
   const projectId = params?.id as string;
-  const { projects, users, tasks, addToast, logActivity, updateProject, addRecentLink, addStakeholder, removeStakeholder } = useStore();
-  const [activeTab, setActiveTab] = useState<"resources" | "tasks" | "stakeholders">("resources");
+  const { projects, users, tasks, addToast, logActivity, updateProject, addRecentLink, addStakeholder, removeStakeholder, addResourceToProject, removeResourceFromProject } = useStore();
+  const [activeTab, setActiveTab] = useState<"resources" | "tasks" | "gantt" | "stakeholders">("resources");
   const [isAddResourceOpen, setIsAddResourceOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [resourceSearchQuery, setResourceSearchQuery] = useState("");
+  const [selectedResourceRole, setSelectedResourceRole] = useState("Member");
   
   const getRoleIcon = (role: string) => {
     switch(role) {
@@ -43,6 +45,8 @@ export default function ProjectDetails() {
   const [stakeholderSearchQuery, setStakeholderSearchQuery] = useState("");
 
   const project = projects.find(p => p.id === projectId);
+  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (project) {
@@ -57,6 +61,10 @@ export default function ProjectDetails() {
   }, [project?.id]);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  const [ganttExpandedTasks, setGanttExpandedTasks] = useState<Set<string>>(new Set());
+
+
   const [editForm, setEditForm] = useState({
     name: project?.name || "",
     description: project?.description || "",
@@ -66,8 +74,11 @@ export default function ProjectDetails() {
     endDate: project?.endDate || "",
     estimateHours: project?.estimateHours || 0,
     themeColor: project?.themeColor || THEME_COLORS[0],
-    avatarUrl: project?.avatarUrl || ""
+    avatarUrl: project?.avatarUrl || "",
+    stakeholders: project?.stakeholders || []
   });
+  const [newEditStakeholderId, setNewEditStakeholderId] = useState("");
+  const [newEditStakeholderRole, setNewEditStakeholderRole] = useState("Client");
 
   if (!project) {
     return (
@@ -85,8 +96,32 @@ export default function ProjectDetails() {
   
   // Real data for tabs based on project
   const projectTasks = tasks.filter(t => t.projectId === project.id);
-  const currentProjectUserIds = project.userIds || users.slice(0, project.resourceCount || 3).map(u => u.id);
-  const projectUsers = users.filter(u => currentProjectUserIds.includes(u.id));
+  
+  useEffect(() => {
+    if (activeTab === "gantt" && ganttExpandedTasks.size === 0) {
+      const hasParents = projectTasks.filter(t => projectTasks.some(c => c.parentId === t.id));
+      setGanttExpandedTasks(new Set(hasParents.map(t => t.id)));
+    }
+  }, [activeTab, projectTasks.length]);
+
+  const toggleGanttExpand = (id: string) => {
+    const next = new Set(ganttExpandedTasks);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setGanttExpandedTasks(next);
+  };
+  const projectResources = project.resources || [];
+  const currentProjectUserIds = projectResources.length > 0 
+    ? projectResources.map(r => r.userId)
+    : (project.userIds || users.slice(0, project.resourceCount || 3).map(u => u.id));
+    
+  const projectUsers = projectResources.length > 0
+    ? projectResources.map(r => {
+        const u = users.find(user => user.id === r.userId);
+        return u ? { ...u, projectRole: r.role } : null;
+      }).filter(Boolean) as (import("@/types").User & { projectRole: string })[]
+    : users.filter(u => currentProjectUserIds.includes(u.id)).map(u => ({ ...u, projectRole: "Member" }));
+    
   const availableUsers = users.filter(u => !currentProjectUserIds.includes(u.id));
 
   const handleAddResource = (e: React.FormEvent) => {
@@ -98,15 +133,15 @@ export default function ProjectDetails() {
       .map(u => u.name)
       .join(", ");
       
-    const newUserIds = [...currentProjectUserIds, ...selectedUsers];
-    updateProject(project.id, { userIds: newUserIds, resourceCount: newUserIds.length });
+    addResourceToProject(project.id, selectedUsers, selectedResourceRole);
       
-    addToast("success", `Added ${addedNames} to project`);
-    logActivity(`Added ${addedNames} to ${project.name}`);
+    addToast("success", `Added ${addedNames} to project as ${selectedResourceRole}`);
+    logActivity(`Added ${addedNames} to ${project.name} as ${selectedResourceRole}`);
     
     setIsAddResourceOpen(false);
     setSelectedUsers([]);
     setResourceSearchQuery("");
+    setSelectedResourceRole("Member");
   };
 
   const toggleUser = (userId: string) => {
@@ -179,7 +214,8 @@ export default function ProjectDetails() {
                 endDate: project.endDate,
                 estimateHours: project.estimateHours,
                 themeColor: project.themeColor || THEME_COLORS[0],
-                avatarUrl: project.avatarUrl || ""
+                avatarUrl: project.avatarUrl || "",
+                stakeholders: project.stakeholders || []
               });
               setIsEditModalOpen(true);
             }}
@@ -190,10 +226,10 @@ export default function ProjectDetails() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* LEFT COLUMN - INFO */}
-        <div className="flex-1 flex flex-col gap-6">
-          <Card className="p-5 flex flex-col gap-4 shadow-sm border-none">
+      <div className="flex flex-1 gap-6 overflow-hidden relative">
+        {/* SIDEBAR */}
+        <div className={`flex flex-col gap-6 overflow-y-auto transition-all duration-300 shrink-0 ${isSidebarOpen ? 'w-full lg:w-[320px] xl:w-[350px] opacity-100' : 'w-0 opacity-0 overflow-hidden hidden lg:flex'} pr-1`}>
+          <Card className="p-5 flex flex-col gap-4 shadow-sm border-none shrink-0">
             <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider pb-1">
               Project Information
             </h3>
@@ -211,11 +247,8 @@ export default function ProjectDetails() {
               </div>
             </div>
           </Card>
-        </div>
 
-        {/* RIGHT COLUMN - STATS */}
-        <div className="w-full lg:w-80 shrink-0">
-          <Card className="p-5 flex flex-col gap-5 bg-primary-light border-primary/20">
+          <Card className="p-5 flex flex-col gap-5 bg-primary-light border-primary/20 shrink-0">
             <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">
               Time Tracking
             </h3>
@@ -247,11 +280,18 @@ export default function ProjectDetails() {
             </div>
           </Card>
         </div>
-      </div>
 
-      {/* BOTTOM TABS */}
-      <Card className="flex flex-col flex-1 overflow-hidden min-h-[400px] shadow-sm border-none">
-        <div className="flex items-center gap-2 p-2 bg-page-bg shrink-0 rounded-t-xl mb-2">
+        {/* MAIN TABS AREA */}
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          <Card className="flex flex-col flex-1 overflow-hidden h-full shadow-sm border-none">
+            <div className="flex items-center gap-2 p-2 bg-page-bg shrink-0 rounded-t-xl mb-2 relative">
+              <button 
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+                className="hidden lg:flex p-2 mr-2 bg-surface text-text-secondary hover:text-primary rounded-md shadow-sm transition-colors"
+                title={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+              >
+                {isSidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
+              </button>
           <button 
             onClick={() => setActiveTab("resources")}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
@@ -278,6 +318,15 @@ export default function ProjectDetails() {
           >
             <Share2 className="w-4 h-4" />
             Stakeholders
+          </button>
+          <button 
+            onClick={() => setActiveTab("gantt")}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              activeTab === "gantt" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
+            }`}
+          >
+            <BarChart2 className="w-4 h-4" />
+            Tasks - Gantt
           </button>
         </div>
 
@@ -312,7 +361,10 @@ export default function ProjectDetails() {
                           <span className="font-semibold text-text-primary text-sm group-hover:text-primary transition-colors cursor-pointer" onClick={() => router.push(`/team/${user.id}`)}>{user.name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-3 text-text-secondary">{user.role}</td>
+                      <td className="px-6 py-3 text-text-secondary">
+                        <span className="font-semibold text-text-primary mr-1">{user.projectRole}</span>
+                        <span className="text-xs text-text-secondary/70">({user.role})</span>
+                      </td>
                       <td className="px-6 py-3">
                         <div className="flex flex-wrap gap-1.5 max-w-[220px]">
                           {user.skills.map(skill => (
@@ -324,9 +376,7 @@ export default function ProjectDetails() {
                       <td className="px-4 py-3 text-center">
                         <button 
                           onClick={() => {
-                            const newUserIds = currentProjectUserIds.filter(id => id !== user.id);
-                            updateProject(project.id, { userIds: newUserIds, resourceCount: newUserIds.length });
-                            
+                            removeResourceFromProject(project.id, user.id);
                             addToast("success", `Removed ${user.name} from project.`);
                             logActivity(`Removed ${user.name} from project ${project.name}`);
                           }}
@@ -347,12 +397,20 @@ export default function ProjectDetails() {
             <div className="flex flex-col h-full">
               <div className="flex justify-between items-center p-4">
                 <h4 className="font-semibold text-text-primary">Project Tasks ({projectTasks.length})</h4>
-                <button 
-                  onClick={() => router.push(`/tasks?project=${project.id}`)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-primary text-surface rounded-md text-xs font-medium hover:bg-primary/90 transition-colors"
-                >
-                  Go to Kanban Board <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => setIsCreateTaskOpen(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] rounded-md text-xs font-medium text-text-primary hover:bg-page-bg transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Create Task
+                  </button>
+                  <button 
+                    onClick={() => router.push(`/tasks?project=${project.id}`)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-primary text-surface rounded-md text-xs font-medium hover:bg-primary/90 transition-colors"
+                  >
+                    Go to Kanban Board <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[600px]">
@@ -389,6 +447,189 @@ export default function ProjectDetails() {
               </div>
             </div>
           )}
+
+          {activeTab === "gantt" && (() => {
+            if (projectTasks.length === 0) {
+              return (
+                <div className="flex flex-col items-center justify-center p-12 h-[300px] text-text-secondary italic">
+                  No tasks available to build Gantt chart.
+                </div>
+              );
+            }
+
+            const flatTasks: (typeof projectTasks[0] & { depth: number, isExpanded: boolean, hasChildren: boolean })[] = [];
+            const roots = projectTasks.filter(t => !t.parentId || !projectTasks.find(p => p.id === t.parentId));
+            
+            const traverse = (tasks: typeof projectTasks, depth: number) => {
+              tasks.forEach(task => {
+                const children = projectTasks.filter(t => t.parentId === task.id);
+                const hasChildren = children.length > 0;
+                const isExpanded = ganttExpandedTasks.has(task.id);
+                flatTasks.push({ ...task, depth, isExpanded, hasChildren });
+                if (isExpanded && hasChildren) {
+                  traverse(children, depth + 1);
+                }
+              });
+            };
+            traverse(roots, 0);
+            
+            let minD = new Date(projectTasks[0].startDate).getTime();
+            let maxD = new Date(projectTasks[0].dueDate || projectTasks[0].startDate).getTime();
+            projectTasks.forEach(t => {
+              const start = new Date(t.startDate).getTime();
+              const end = new Date(t.dueDate || t.startDate).getTime();
+              if (start && !isNaN(start)) minD = Math.min(minD, start);
+              if (end && !isNaN(end)) maxD = Math.max(maxD, end);
+            });
+            // Pad 2 days
+            minD -= 2 * 24 * 60 * 60 * 1000;
+            maxD += 2 * 24 * 60 * 60 * 1000;
+            
+            const ganttStart = new Date(minD);
+            const days = Math.max(1, Math.ceil((maxD - minD) / (24 * 60 * 60 * 1000)));
+            const dayWidth = 28;
+
+            return (
+              <div className="flex flex-col h-full bg-surface">
+                <div className="flex justify-between items-center p-4 border-b border-border-color shrink-0">
+                  <h4 className="font-semibold text-text-primary flex items-center gap-2">
+                    <BarChart2 className="w-5 h-5 text-primary" />
+                    Treeview Gantt ({projectTasks.length} Tasks)
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => setGanttExpandedTasks(new Set(projectTasks.map(t => t.id)))}
+                      className="px-2.5 py-1 text-[11px] font-medium text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors"
+                    >
+                      Expand All
+                    </button>
+                    <button 
+                      onClick={() => setGanttExpandedTasks(new Set())}
+                      className="px-2.5 py-1 text-[11px] font-medium text-text-secondary bg-page-bg rounded hover:bg-black/5 transition-colors border border-border-color"
+                    >
+                      Collapse All
+                    </button>
+                  </div>
+                </div>
+                <div className="flex flex-1 overflow-auto relative min-h-[400px]">
+                  {/* Left Sidebar Table */}
+                  <div className="w-[480px] shrink-0 border-r border-border-color bg-surface sticky left-0 z-20 flex flex-col shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
+                    <div className="h-10 shrink-0 border-b border-border-color flex items-center px-4 font-bold text-[11px] text-text-secondary bg-page-bg uppercase tracking-wider relative">
+                      <div className="w-[230px] shrink-0">Task Name</div>
+                      <div className="w-[90px] shrink-0">Status</div>
+                      <div className="w-[60px] shrink-0">Start</div>
+                      <div className="w-[60px] shrink-0">End</div>
+                    </div>
+                    <div className="flex flex-col flex-1 pb-10">
+                      {flatTasks.map(t => (
+                        <div key={t.id} className={`h-10 shrink-0 border-b border-border-color flex items-center px-4 hover:bg-page-bg/50 transition-colors ${t.depth === 0 ? 'bg-page-bg/20' : ''}`}>
+                          <div className="w-[230px] shrink-0 flex items-center pr-2" style={{ paddingLeft: t.depth * 16 }}>
+                            {t.hasChildren ? (
+                              <button 
+                                onClick={() => toggleGanttExpand(t.id)}
+                                className="w-5 h-5 flex items-center justify-center shrink-0 text-text-secondary hover:text-primary transition-colors hover:bg-primary/10 rounded -ml-1 mr-1"
+                              >
+                                {t.isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                              </button>
+                            ) : (
+                              <span className="w-5 h-5 shrink-0 -ml-1 mr-1" />
+                            )}
+                            <span className={`text-[13px] truncate ${t.depth === 0 ? 'font-bold text-text-primary' : 'font-medium text-text-secondary'}`} title={t.title}>{t.title}</span>
+                          </div>
+                          <div className="w-[90px] shrink-0 pr-2">
+                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${t.status === 'Completed' ? 'bg-success/10 text-success' : t.status === 'In Progress' ? 'bg-primary/10 text-primary' : t.status === 'Pending' ? 'bg-warning/10 text-warning-dark' : 'bg-page-bg text-text-secondary border border-border-color' }`}>
+                              {t.status}
+                            </span>
+                          </div>
+                          <div className="w-[60px] shrink-0 text-[11px] text-text-secondary truncate pr-2">
+                            {new Date(t.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </div>
+                          <div className="w-[60px] shrink-0 text-[11px] text-text-secondary truncate">
+                            {t.dueDate ? new Date(t.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "N/A"}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right Timeline */}
+                  <div className="flex-1 overflow-auto relative bg-page-bg/30">
+                    <div className="flex h-10 shrink-0 border-b border-border-color bg-page-bg min-w-max sticky top-0 z-10">
+                      {Array.from({ length: days }).map((_, i) => {
+                         const d = new Date(ganttStart.getTime() + i * 24 * 60 * 60 * 1000);
+                         const isFirst = d.getDate() === 1 || i === 0 || d.getDay() === 1; // Show on Mondays
+                         const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                         return (
+                           <div key={i} className={`flex-shrink-0 flex items-center justify-center border-r border-border-color/40 text-[10px] ${isWeekend ? 'bg-black/5 text-text-secondary font-medium' : 'text-text-secondary/70'}`} style={{ width: dayWidth }}>
+                             {isFirst ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : d.getDate()}
+                           </div>
+                         );
+                      })}
+                    </div>
+                    <div className="relative min-w-max pb-10" style={{ height: Math.max(400, flatTasks.length * 40 + 40), width: days * dayWidth }}>
+                      {/* Grid backgrounds */}
+                      <div className="absolute inset-0 flex pointer-events-none">
+                        {Array.from({ length: days }).map((_, i) => {
+                           const d = new Date(ganttStart.getTime() + i * 24 * 60 * 60 * 1000);
+                           const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                           return (
+                             <div key={i} className={`flex-shrink-0 border-r border-border-color/30 h-full ${isWeekend ? 'bg-black/[0.02]' : ''}`} style={{ width: dayWidth }}></div>
+                           );
+                        })}
+                      </div>
+                      
+                      {/* Bars */}
+                      {flatTasks.map((t, index) => {
+                        const startMs = new Date(t.startDate).getTime();
+                        let endMs = new Date(t.dueDate || t.startDate).getTime();
+                        if (isNaN(startMs)) return null;
+                        if (isNaN(endMs)) endMs = startMs;
+                        
+                        const startOffset = Math.max(0, (startMs - ganttStart.getTime()) / (24 * 60 * 60 * 1000));
+                        const duration = Math.max(1, ((endMs - startMs) / (24 * 60 * 60 * 1000)) + 1);
+                        
+                        let bgColor = "bg-primary";
+                        if (t.status === "Completed") bgColor = "bg-success";
+                        if (t.status === "Pending" || t.status === "On Hold") bgColor = "bg-warning";
+                        if (t.status === "Closed") bgColor = "bg-slate-400";
+                        if (t.status === "No Specs") bgColor = "bg-danger";
+                        
+                        const isPhase = t.hasChildren;
+                        
+                        return (
+                          <div key={t.id} className="absolute h-10 flex items-center hover:bg-black/5 transition-colors" style={{ top: index * 40, left: 0, width: days * dayWidth }}>
+                            {isPhase ? (
+                              <div 
+                                className="absolute h-[6px] bg-text-primary flex items-center opacity-80 rounded-sm"
+                                style={{ left: startOffset * dayWidth, width: duration * dayWidth, minWidth: '4px' }}
+                                title={`${t.title} (Phase)`}
+                              >
+                                {/* Triangle pointers for phases */}
+                                <div className="absolute -left-[1px] -bottom-[5px] w-0 h-0 border-l-[5px] border-l-transparent border-t-[5px] border-t-text-primary border-r-[5px] border-r-transparent"></div>
+                                <div className="absolute -right-[1px] -bottom-[5px] w-0 h-0 border-l-[5px] border-l-transparent border-t-[5px] border-t-text-primary border-r-[5px] border-r-transparent"></div>
+                              </div>
+                            ) : (
+                              <div 
+                                className={`absolute h-6 rounded-md shadow-sm ${bgColor} flex items-center justify-center opacity-80 hover:opacity-100 cursor-pointer overflow-hidden group transition-all`}
+                                style={{ left: startOffset * dayWidth, width: duration * dayWidth, minWidth: '4px' }}
+                                title={`${t.title} (${t.status})`}
+                              >
+                                {duration * dayWidth > 60 && (
+                                  <span className={`text-[10px] font-semibold px-2 truncate opacity-90 ${bgColor === 'bg-warning' ? 'text-amber-950' : 'text-white'}`}>
+                                    {t.estimateHours}h
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {activeTab === "stakeholders" && (
             <div className="flex flex-col h-full">
@@ -451,6 +692,8 @@ export default function ProjectDetails() {
           )}
         </div>
       </Card>
+      </div>
+      </div>
 
       {/* ADD RESOURCE MODAL */}
       {isAddResourceOpen && (
@@ -524,6 +767,25 @@ export default function ProjectDetails() {
                     ? `Select at least one member to invite to ${project.name}.` 
                     : `${selectedUsers.length} member(s) selected.`}
                 </p>
+                <div className="flex flex-col gap-1 mt-4 pt-4 border-t border-border-color/30">
+                  <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Project Role</label>
+                  <select 
+                    value={selectedResourceRole}
+                    onChange={(e) => setSelectedResourceRole(e.target.value)}
+                    className="w-full px-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
+                  >
+                    <option value="Member">Member</option>
+                    <option value="PM">Project Manager (PM)</option>
+                    <option value="BA">Business Analyst (BA)</option>
+                    <option value="Frontend">Frontend Developer</option>
+                    <option value="Backend">Backend Developer</option>
+                    <option value="Fullstack">Fullstack Developer</option>
+                    <option value="QC">Quality Control (QC)</option>
+                    <option value="QA">Quality Assurance (QA)</option>
+                    <option value="DevOps">DevOps Engineer</option>
+                    <option value="Design">Designer / UI/UX</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 mt-4 pt-4">
@@ -610,6 +872,64 @@ export default function ProjectDetails() {
               type="url" value={editForm.avatarUrl} onChange={e => setEditForm({...editForm, avatarUrl: e.target.value})} placeholder="https://example.com/logo.png"
               className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary"
             />
+          </div>
+
+          <div className="flex flex-col gap-1.5 mt-2">
+            <label className="text-sm font-medium text-text-primary">Stakeholders <span className="text-text-secondary font-normal">(optional)</span></label>
+            <div className="flex flex-col gap-2">
+              {editForm.stakeholders.map((s, idx) => (
+                <div key={idx} className="flex items-center justify-between bg-surface/50 px-3 py-2 rounded-md shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]">
+                  <div className="flex items-center gap-2">
+                     <Building2 className="w-4 h-4 text-primary/70" />
+                     <span className="text-sm font-medium text-text-primary">{s.name}</span>
+                     <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary font-medium uppercase tracking-wider">{s.role}</span>
+                  </div>
+                  <button type="button" onClick={() => setEditForm({...editForm, stakeholders: editForm.stakeholders.filter((_, i) => i !== idx)})} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1 rounded transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+
+              <div className="flex items-center gap-2 mt-1 relative">
+                <div className="flex-1">
+                  <CustomSelect 
+                    value={newEditStakeholderId} 
+                    onChange={setNewEditStakeholderId}
+                    options={[
+                      { value: "", label: "Select User..." },
+                      ...users.filter(u => !editForm.stakeholders.find(s => s.id === u.id)).map(u => ({ value: u.id, label: u.name }))
+                    ]}
+                  />
+                </div>
+                <div className="w-[140px]">
+                  <CustomSelect 
+                    value={newEditStakeholderRole} 
+                    onChange={setNewEditStakeholderRole}
+                    options={[
+                      { value: "Client", label: "Client" },
+                      { value: "Sponsor", label: "Sponsor" },
+                      { value: "Partner", label: "Partner" },
+                      { value: "Business Owner", label: "Business Owner" }
+                    ]}
+                  />
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                     if (!newEditStakeholderId) return;
+                     const u = users.find(u => u.id === newEditStakeholderId);
+                     if (u) {
+                       setEditForm({...editForm, stakeholders: [...editForm.stakeholders, { id: u.id, name: u.name, role: newEditStakeholderRole, isCustom: false }]});
+                       setNewEditStakeholderId("");
+                     }
+                  }}
+                  disabled={!newEditStakeholderId}
+                  className="px-3 py-1.5 bg-primary/10 text-primary rounded-md text-sm font-medium hover:bg-primary/20 transition-colors whitespace-nowrap disabled:opacity-50 h-[38px] flex items-center justify-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -754,6 +1074,13 @@ export default function ProjectDetails() {
           </div>
         </form>
       </Modal>
+
+      {/* CREATE TASK MODAL */}
+      <CreateTaskModal 
+        isOpen={isCreateTaskOpen} 
+        onClose={() => setIsCreateTaskOpen(false)} 
+        defaultProjectId={project.id} 
+      />
     </div>
   );
 }

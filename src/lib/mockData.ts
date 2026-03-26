@@ -58,7 +58,7 @@ export const MOCK_PROJECTS: Project[] = [
     taskCount: 0,
     themeColor: THEME_COLORS[4],
     avatarUrl: "https://www.mezy.com.au/wp-content/uploads/2015/09/logo-white-300x150.png",
-    userIds: ["u20", "u16", "u1"],
+    resources: [{ userId: "u20", role: "BA" }, { userId: "u16", role: "Backend" }, { userId: "u1", role: "PM" }],
     stakeholders: [
       { id: "sh1", name: "Pat Ormond", role: "Business Owner", isCustom: false },
       { id: "sh2", name: "Jo Ormond", role: "Sponsor", isCustom: false }
@@ -80,7 +80,7 @@ export const MOCK_PROJECTS: Project[] = [
     taskCount: 0,
     themeColor: THEME_COLORS[5],
     avatarUrl: "https://debmanagers-ad.sourcefunding.com.au/config/logo.png",
-    userIds: ["u9", "u11", "u3", "u19"],
+    resources: [{ userId: "u9", role: "BA" }, { userId: "u11", role: "Frontend" }, { userId: "u3", role: "Frontend" }, { userId: "u19", role: "Backend" }],
     stakeholders: [
       { id: "sh-client-1", name: "Source Funding", role: "Client", isCustom: true }
     ]
@@ -101,7 +101,7 @@ export const MOCK_PROJECTS: Project[] = [
     taskCount: 0,
     themeColor: THEME_COLORS[6],
     avatarUrl: "https://www.mezy.com.au/favicon.ico",
-    userIds: ["u23", "u15", "u17", "u1"],
+    resources: [{ userId: "u23", role: "Developer" }, { userId: "u15", role: "Frontend" }, { userId: "u17", role: "Design" }, { userId: "u1", role: "PM" }],
     stakeholders: [
       { id: "sh1", name: "Pat Ormond", role: "Business Owner", isCustom: false },
       { id: "sh-partner-1", name: "Alpha Tech Solutions", role: "IT Service", isCustom: true }
@@ -122,7 +122,7 @@ export const MOCK_PROJECTS: Project[] = [
     resourceCount: 3,
     taskCount: 0,
     themeColor: THEME_COLORS[7],
-    userIds: ["u8", "u11", "u1"],
+    resources: [{ userId: "u8", role: "QC" }, { userId: "u11", role: "Frontend" }, { userId: "u1", role: "PM" }],
     stakeholders: [
       { id: "sh-vendor", name: "Valuation DB Provider", role: "Vendor", isCustom: true }
     ]
@@ -143,7 +143,7 @@ export const MOCK_PROJECTS: Project[] = [
     taskCount: 0,
     themeColor: THEME_COLORS[8],
     avatarUrl: "https://debmanagers-ad.sourcefunding.com.au/favicon.ico",
-    userIds: ["u9", "u19", "u15", "u14"],
+    resources: [{ userId: "u9", role: "BA" }, { userId: "u19", role: "Backend" }, { userId: "u15", role: "Frontend" }, { userId: "u14", role: "QC" }],
     stakeholders: [
       { id: "sh-client-3", name: "Internal HR Team", role: "Client", isCustom: true },
       { id: "sh-partner-3", name: "Source Recruitment", role: "Partner", isCustom: true }
@@ -243,6 +243,59 @@ export const MOCK_TASKS: Task[] = [
   {
     id: "t23", projectId: "p7", title: "Setup CI/CD pipeline", description: "GitHub Actions for automated deployments",
     status: "Pending", priority: "High", assigneeId: "u22", estimateHours: 16, actualHours: 0, startDate: "2026-05-20", dueDate: "2026-05-25",
+  },
+  // MOCK DATA FOR GANTT CHART (Project p1)
+  {
+    id: "p1_phase1", projectId: "p1", title: "1. Design & Research Phase", description: "Initial design phase",
+    status: "In Progress", priority: "High", assigneeId: "u1", estimateHours: 165, actualHours: 142, startDate: "2026-03-01", dueDate: "2026-03-25",
+  },
+  {
+    id: "t24", projectId: "p1", title: "Discovery & User Research", description: "Interview stakeholders",
+    status: "Completed", priority: "High", assigneeId: "u1", estimateHours: 40, actualHours: 42, startDate: "2026-03-01", dueDate: "2026-03-05", parentId: "p1_phase1"
+  },
+  {
+    id: "t25", projectId: "p1", title: "Wireframing & UX", description: "Low fidelity wireframes",
+    status: "Completed", priority: "Medium", assigneeId: "u2", estimateHours: 45, actualHours: 40, startDate: "2026-03-06", dueDate: "2026-03-12", parentId: "p1_phase1"
+  },
+  {
+    id: "t26", projectId: "p1", title: "High-Fidelity UI Design", description: "Figma mockups",
+    status: "In Progress", priority: "High", assigneeId: "u3", estimateHours: 80, actualHours: 60, startDate: "2026-03-13", dueDate: "2026-03-25", parentId: "p1_phase1"
+  },
+  {
+    id: "p1_phase2", projectId: "p1", title: "2. Frontend Engineering", description: "Core frontend implementation",
+    status: "To Do", priority: "Critical", assigneeId: "u4", estimateHours: 244, actualHours: 20, startDate: "2026-03-20", dueDate: "2026-04-30",
+  },
+  {
+    id: "t27", projectId: "p1", title: "Frontend Architecture Setup", description: "Next.js and Tailwind config",
+    status: "In Progress", priority: "Critical", assigneeId: "u4", estimateHours: 24, actualHours: 20, startDate: "2026-03-20", dueDate: "2026-03-30", parentId: "p1_phase2"
+  },
+  {
+    id: "t28", projectId: "p1", title: "Component Library Implementation", description: "Build reusable UI components",
+    status: "To Do", priority: "High", assigneeId: "u5", estimateHours: 120, actualHours: 0, startDate: "2026-03-30", dueDate: "2026-04-15", parentId: "p1_phase2"
+  },
+  {
+    id: "t29", projectId: "p1", title: "Page Implementation", description: "Assemble pages using components",
+    status: "To Do", priority: "Medium", assigneeId: "u6", estimateHours: 100, actualHours: 0, startDate: "2026-04-15", dueDate: "2026-04-30", parentId: "p1_phase2"
+  },
+  {
+    id: "p1_phase3", projectId: "p1", title: "3. Integration & Launch", description: "Final connections and deployment",
+    status: "Pending", priority: "High", assigneeId: "u7", estimateHours: 200, actualHours: 0, startDate: "2026-04-20", dueDate: "2026-05-25",
+  },
+  {
+    id: "t30", projectId: "p1", title: "State Management & Reactivity", description: "Zustand stores and effects",
+    status: "Pending", priority: "High", assigneeId: "u7", estimateHours: 60, actualHours: 0, startDate: "2026-04-20", dueDate: "2026-05-05", parentId: "p1_phase3"
+  },
+  {
+    id: "t31", projectId: "p1", title: "API Integration", description: "Connect to backend endpoints",
+    status: "Pending", priority: "Critical", assigneeId: "u8", estimateHours: 80, actualHours: 0, startDate: "2026-05-01", dueDate: "2026-05-15", parentId: "p1_phase3"
+  },
+  {
+    id: "t32", projectId: "p1", title: "Testing & QA", description: "E2E and unit tests",
+    status: "On Hold", priority: "Medium", assigneeId: "u9", estimateHours: 40, actualHours: 0, startDate: "2026-05-10", dueDate: "2026-05-20", parentId: "p1_phase3"
+  },
+  {
+    id: "t33", projectId: "p1", title: "Final Polish & Go Live", description: "Production deployment",
+    status: "No Specs", priority: "High", assigneeId: "u1", estimateHours: 20, actualHours: 0, startDate: "2026-05-20", dueDate: "2026-05-25", parentId: "p1_phase3"
   }
 ];
 

@@ -11,8 +11,8 @@ import { useStore } from "@/store/useStore";
 import { THEME_COLORS } from "@/lib/mockData";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
-import { Search, Filter, Calendar as CalendarIcon, PieChart, Users, Plus, LayoutGrid, List, AlignLeft, FolderKanban } from "lucide-react";
-import { EstimateSource, Project } from "@/types";
+import { Search, Filter, Calendar as CalendarIcon, PieChart, Users, Plus, LayoutGrid, List, AlignLeft, FolderKanban, X, Building2 } from "lucide-react";
+import { EstimateSource, Project, ProjectStatus } from "@/types";
 
 export default function ProjectsList() {
   const { projects, tasks, users, addProject, logActivity, addToast } = useStore();
@@ -21,13 +21,16 @@ export default function ProjectsList() {
   // Form State
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [status, setStatus] = useState<ProjectStatus>("Active");
   const [estSource, setEstSource] = useState<EstimateSource>("TASK");
   const [estHours, setEstHours] = useState("");
   const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
   const [endDate, setEndDate] = useState("");
   const [themeColor, setThemeColor] = useState(THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]);
   const [avatarUrl, setAvatarUrl] = useState("");
-
+  const [stakeholders, setStakeholders] = useState<{id: string, name: string, role: string, isCustom: boolean}[]>([]);
+  const [newStakeholderId, setNewStakeholderId] = useState("");
+  const [newStakeholderRole, setNewStakeholderRole] = useState("Client");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortOption, setSortOption] = useState("Newest");
@@ -40,7 +43,7 @@ export default function ProjectsList() {
       id: `p-${Date.now()}`,
       name,
       description,
-      status: "Active",
+      status: status,
       estimateSource: estSource,
       startDate: startDate || new Date().toISOString().split("T")[0],
       endDate: endDate || "2026-12-31", // default if empty
@@ -52,6 +55,7 @@ export default function ProjectsList() {
       taskCount: 0,
       themeColor,
       avatarUrl: avatarUrl ? avatarUrl : undefined,
+      stakeholders: stakeholders,
     };
 
     addProject(newProject);
@@ -60,6 +64,8 @@ export default function ProjectsList() {
     
     // Reset and close
     setName(""); setDescription(""); setEstHours(""); setEndDate(""); setAvatarUrl("");
+    setStatus("Active");
+    setStakeholders([]); setNewStakeholderId("");
     setThemeColor(THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]);
     setIsModalOpen(false);
   };
@@ -263,12 +269,28 @@ export default function ProjectsList() {
               placeholder="Brief overview of the project"
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-text-primary">Avatar URL <span className="text-text-secondary font-normal">(optional)</span></label>
-            <input 
-              type="url" value={avatarUrl} onChange={e => setAvatarUrl(e.target.value)} placeholder="https://example.com/logo.png"
-              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-text-primary">Status</label>
+              <CustomSelect 
+                value={status} 
+                onChange={(val: any) => setStatus(val as ProjectStatus)}
+                options={[
+                  { value: "Active", label: "Active" },
+                  { value: "On Hold", label: "On Hold" },
+                  { value: "Completed", label: "Completed" },
+                  { value: "Cancelled", label: "Cancelled" },
+                  { value: "Draft", label: "Draft" }
+                ]}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-text-primary">Avatar URL <span className="text-text-secondary font-normal">(optional)</span></label>
+              <input 
+                type="url" value={avatarUrl} onChange={e => setAvatarUrl(e.target.value)} placeholder="https://example.com/logo.png"
+                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary h-[38px]"
+              />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
@@ -305,6 +327,64 @@ export default function ProjectsList() {
                 type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
                 className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
               />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5 mt-2">
+            <label className="text-sm font-medium text-text-primary">Stakeholders <span className="text-text-secondary font-normal">(optional)</span></label>
+            <div className="flex flex-col gap-2">
+              {stakeholders.map((s, idx) => (
+                <div key={idx} className="flex items-center justify-between bg-surface/50 px-3 py-2 rounded-md shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]">
+                  <div className="flex items-center gap-2">
+                     <Building2 className="w-4 h-4 text-primary/70" />
+                     <span className="text-sm font-medium text-text-primary">{s.name}</span>
+                     <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary font-medium uppercase tracking-wider">{s.role}</span>
+                  </div>
+                  <button type="button" onClick={() => setStakeholders(prev => prev.filter((_, i) => i !== idx))} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1 rounded transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+
+              <div className="flex items-center gap-2 mt-1 relative">
+                <div className="flex-1">
+                  <CustomSelect 
+                    value={newStakeholderId} 
+                    onChange={setNewStakeholderId}
+                    options={[
+                      { value: "", label: "Select User..." },
+                      ...users.filter(u => !stakeholders.find(s => s.id === u.id)).map(u => ({ value: u.id, label: u.name }))
+                    ]}
+                  />
+                </div>
+                <div className="w-[140px]">
+                  <CustomSelect 
+                    value={newStakeholderRole} 
+                    onChange={setNewStakeholderRole}
+                    options={[
+                      { value: "Client", label: "Client" },
+                      { value: "Sponsor", label: "Sponsor" },
+                      { value: "Partner", label: "Partner" },
+                      { value: "Business Owner", label: "Business Owner" }
+                    ]}
+                  />
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                     if (!newStakeholderId) return;
+                     const u = users.find(u => u.id === newStakeholderId);
+                     if (u) {
+                       setStakeholders(prev => [...prev, { id: u.id, name: u.name, role: newStakeholderRole, isCustom: false }]);
+                       setNewStakeholderId("");
+                     }
+                  }}
+                  disabled={!newStakeholderId}
+                  className="px-3 py-1.5 bg-primary/10 text-primary rounded-md text-sm font-medium hover:bg-primary/20 transition-colors whitespace-nowrap disabled:opacity-50 h-[38px] flex items-center justify-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add
+                </button>
+              </div>
             </div>
           </div>
 

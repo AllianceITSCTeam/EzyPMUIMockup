@@ -16,3 +16,8 @@ Tài liệu này ghi chú lại các quy tắc và tiêu chuẩn về UI/UX đư
 ## 3. Hydration (Next.js)
 - Không gọi trực tiếp `new Date()` bên trong JSX của các Server/Client Component trong Next.js vì sẽ dẫn đến lỗi "Hydration Mismatch" (do chênh lệch mili-giây hoặc Timezone giữa Server và Client).
 - Luôn bọc các giá trị biến đổi thời gian (`Date.now()`, `toISOString()`) hoặc UI động trong một state `mounted` (kích hoạt qua `useEffect`) để đảm bảo chúng chỉ render sau khi Client đã tải xong.
+
+## 4. Thiết kế Điều khiển (Controls & Styling)
+- **Loại bỏ đường viền (Borderless):** Tuyệt đối hạn chế sử dụng outline/border cứng (`border border-border-color`) cho các control nhập liệu (input, select, textarea) hoặc các thẻ danh sách nội bộ.
+- **Sử dụng nền màu (Background over Border):** Thay vì dùng viền mỏng dễ gây cảm giác giao diện cũ, hãy dùng nền nhẹ (`bg-surface/50` kết hợp `hover:bg-page-bg`) và đổ bóng mờ chìm bên trong (`shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]`) để định hình vùng nhập hoặc chọn. 
+- **Tag và Label:** Khi làm tag thông tin (vai trò, trạng thái không chính), dùng background nhẹ theo màu chủ đạo (ví dụ: `bg-primary/10 text-primary`) thay vì dùng hộp có viền màu đen/sẫm xỉn màu. Tránh dùng `bg-page-bg` nếu nó tạo ra mảng đen làm tối form tổng thể.

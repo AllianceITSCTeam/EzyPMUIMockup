@@ -51,6 +51,8 @@ interface AppState {
   addRecentLink: (link: RecentLink) => void;
   addStakeholder: (projectId: string, stakeholder: import('../types').ProjectStakeholder) => void;
   removeStakeholder: (projectId: string, stakeholderId: string) => void;
+  addResourceToProject: (projectId: string, userIds: string[], role: string) => void;
+  removeResourceFromProject: (projectId: string, userId: string) => void;
   addSystemStakeholder: (sh: Stakeholder) => void;
   updateSystemStakeholder: (id: string, updates: Partial<Stakeholder>) => void;
   deleteSystemStakeholder: (id: string) => void;
@@ -162,6 +164,27 @@ export const useStore = create<AppState>()(
             ? { ...p, stakeholders: (p.stakeholders || []).filter(s => s.id !== stakeholderId) } 
             : p
         )
+      })),
+
+      addResourceToProject: (projectId, userIds, role) => set((state) => ({
+        projects: state.projects.map(p => {
+          if (p.id !== projectId) return p;
+          const newResources = [...(p.resources || [])];
+          userIds.forEach(uid => {
+            if (!newResources.some(r => r.userId === uid)) {
+              newResources.push({ userId: uid, role });
+            }
+          });
+          return { ...p, resources: newResources, resourceCount: newResources.length };
+        })
+      })),
+
+      removeResourceFromProject: (projectId, userId) => set((state) => ({
+        projects: state.projects.map(p => {
+          if (p.id !== projectId) return p;
+          const newResources = (p.resources || []).filter(r => r.userId !== userId);
+          return { ...p, resources: newResources, resourceCount: newResources.length };
+        })
       })),
 
       addSystemStakeholder: (sh) => set((state) => ({

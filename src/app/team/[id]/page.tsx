@@ -7,9 +7,10 @@ import { useStore } from "@/store/useStore";
 import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/Badge";
 import { SkillInput } from "@/components/ui/SkillInput";
+import { CreateTaskModal } from "@/components/ui/CreateTaskModal";
 import { SkillTag } from "@/components/ui/SkillTag";
 import { UserAvatar } from "@/components/ui/UserAvatar"; // Added this import
-import { ChevronRight, ArrowLeft, Pencil, X } from "lucide-react";
+import { ChevronRight, ArrowLeft, Pencil, X, Plus } from "lucide-react";
 
 export default function UserDetails() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function UserDetails() {
   const userId = params?.id as string;
   const { users, projects, tasks, updateUser, addToast, logActivity, addRecentLink } = useStore();
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const user = users.find(u => u.id === userId);
 
   useEffect(() => {
@@ -190,7 +192,15 @@ export default function UserDetails() {
 
         {/* ACTIVE TASKS */}
         <div>
-          <h3 className="font-bold text-lg text-text-primary mb-3">Active Tasks</h3>
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-bold text-lg text-text-primary">Active Tasks</h3>
+            <button 
+              onClick={() => setIsCreateTaskOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-color shadow-sm rounded-md text-xs font-medium text-text-primary hover:bg-page-bg transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" /> Create Task
+            </button>
+          </div>
           <Card className="overflow-hidden">
             <table className="w-full text-left border-collapse text-sm">
               <thead className="bg-page-bg text-text-secondary text-xs uppercase">
@@ -307,6 +317,13 @@ export default function UserDetails() {
           </div>
         </div>
       )}
+
+      {/* CREATE TASK MODAL */}
+      <CreateTaskModal 
+        isOpen={isCreateTaskOpen} 
+        onClose={() => setIsCreateTaskOpen(false)} 
+        defaultAssigneeId={user.id} 
+      />
     </div>
   );
 }
