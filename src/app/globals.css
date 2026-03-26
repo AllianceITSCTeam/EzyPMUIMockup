@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-page-bg: var(--page-bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border-color);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-secondary: var(--secondary);
+  --color-secondary-light: var(--secondary-light);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --font-sans: var(--font-inter);
+}
+
+:root {
+  --page-bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --border-color: rgba(15, 23, 42, 0.06);
+  --primary: #4F46E5;
+  --primary-light: #EEF2FF;
+  --secondary: #0F172A;
+  --secondary-light: #F8FAFC;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+}
+
+.dark {
+  --page-bg: #050505;
+  --surface: #111111;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --primary: #818CF8;
+  --primary-light: rgba(129, 140, 248, 0.12);
+  --secondary: #F4F4F5;
+  --secondary-light: #27272A;
+  --success: #34D399;
+  --warning: #FBBF24;
+  --danger: #F87171;
+  --text-primary: #EDEDED;
+  --text-secondary: #A1A1AA;
+}
+
+::selection {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+.dark ::selection {
+  background-color: rgba(129, 140, 248, 0.3);
+  color: #ffffff;
+}
+
+body {
+  background-color: var(--page-bg);
+  color: var(--text-primary);
+  font-family: var(--font-inter), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
