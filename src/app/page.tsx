@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -18,6 +18,11 @@ export default function Dashboard() {
   const router = useRouter();
   const { tasks, projects, activities, users, currentUser } = useStore();
   const [activeTab, setActiveTab] = useState("Current Tasks");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const filteredTasks = tasks.filter((t) => {
     if (activeTab === "Current Tasks") return t.status === "In Progress" || t.status === "To Do";
@@ -30,9 +35,9 @@ export default function Dashboard() {
   const totalTasks = userTasks.length;
   const activeProjectsCount = new Set(userTasks.map((t) => t.projectId)).size;
   const inProgressTasks = userTasks.filter((t) => t.status === "In Progress").length;
-  const overdueTasks = userTasks.filter((t) => t.status !== "Completed" && t.status !== "Closed" && t.dueDate && new Date(t.dueDate).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)).length;
+  const overdueTasks = mounted ? userTasks.filter((t) => t.status !== "Completed" && t.status !== "Closed" && t.dueDate && new Date(t.dueDate).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)).length : 0;
   const hoursThisMonth = currentUser?.id === "u1" ? 124 : currentUser?.id === "u2" ? 40 : 16;
-  const currentMonth = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const currentMonth = mounted ? new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }) : '';
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -53,7 +58,7 @@ export default function Dashboard() {
             <div>
               <p className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">Total Tasks</p>
               <p className="text-4xl font-black mt-2 tracking-tight text-text-primary">{totalTasks}</p>
-              <p className="text-xs mt-1 text-text-secondary">Across {activeProjectsCount} projects</p>
+              <p className="text-xs mt-1 text-text-secondary">Across {activeProjectsCount} project{activeProjectsCount === 1 ? '' : 's'}</p>
             </div>
             <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary/10 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
               <ClipboardList className="w-5 h-5 text-primary" />

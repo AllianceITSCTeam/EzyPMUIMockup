@@ -332,3 +332,40 @@ RAW_USERS.forEach((u, idx) => {
     });
   }
 });
+
+// Auto-fill project metrics to make charts look realistic
+const projectBumps: Record<string, {actual: number, progress: number}> = {
+  "p4": { actual: 320, progress: 64 },
+  "p5": { actual: 280, progress: 80 },
+  "p6": { actual: 850, progress: 106 },
+  "p7": { actual: 410, progress: 68 },
+  "p8": { actual: 150, progress: 37 }
+};
+
+MOCK_PROJECTS.forEach(p => {
+  if (projectBumps[p.id]) {
+    p.actualHours = projectBumps[p.id].actual;
+    p.remainingHours = Math.max(0, p.estimateHours - p.actualHours);
+    p.progressPercentage = projectBumps[p.id].progress;
+  }
+});
+
+// Auto-generate time logs for charts (especially for the first 6 users)
+const todayStr = new Date().toISOString().split("T")[0];
+const targetUsers = ["u1", "u2", "u3", "u4", "u5", "u6"];
+
+MOCK_TASKS.forEach(t => {
+  if (!t.timeLogs) t.timeLogs = [];
+  
+  // existing actual hours
+  if (t.actualHours > 0) {
+    t.timeLogs.push({ id: `log-${t.id}-1`, userId: t.assigneeId || "u1", date: todayStr, hours: t.actualHours, comment: "Logged time" });
+  }
+
+  // add extra hours if it's a target user to fill out the utilization chart
+  if (targetUsers.includes(t.assigneeId!)) {
+    const extra = Math.floor(Math.random() * 20) + 10; // 10-30 hours
+    t.actualHours += extra;
+    t.timeLogs.push({ id: `log-${t.id}-extra`, userId: t.assigneeId!, date: todayStr, hours: extra, comment: "Additional work for charting" });
+  }
+});

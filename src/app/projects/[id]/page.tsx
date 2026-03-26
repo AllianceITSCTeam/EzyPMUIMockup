@@ -454,7 +454,7 @@ export default function ProjectDetails() {
 
       {/* ADD RESOURCE MODAL */}
       {isAddResourceOpen && (
-        <div className="fixed inset-0 bg-secondary/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-secondary/20 flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-border-color">
             <div className="flex justify-between items-center p-4 bg-page-bg">
               <h3 className="font-bold text-lg text-text-primary">Add Resource to Project</h3>
@@ -645,7 +645,7 @@ export default function ProjectDetails() {
             </div>
           </div>
 
-          <div className="mt-4 flex justify-end gap-3 pt-4 border-t border-border-color">
+          <div className="mt-4 flex justify-end gap-3">
             <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
               Cancel
             </button>
@@ -661,7 +661,7 @@ export default function ProjectDetails() {
         setIsAddStakeholderOpen(false);
         setStakeholderForm({ name: "", role: "Client", isCustom: true, id: "" });
         setStakeholderSearchQuery("");
-      }} title="Add Stakeholder">
+      }} title="Add Stakeholder" className="max-w-xl" contentClassName="overflow-visible">
         <form onSubmit={handleAddStakeholder} className="flex flex-col gap-4">
           <div className="flex flex-col gap-3">
             <label className="text-sm font-medium text-text-primary">Search System Member or type Custom Name *</label>
@@ -727,7 +727,7 @@ export default function ProjectDetails() {
             </div>
           )}
 
-          <div className="mt-4 flex justify-end gap-3 pt-4 border-t border-border-color">
+          <div className="mt-4 flex justify-end gap-3">
             <button type="button" onClick={() => {
               setIsAddStakeholderOpen(false);
               setStakeholderForm({ name: "", role: "Client", isCustom: true, id: "" });
