@@ -14,7 +14,7 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { SkillTag } from "@/components/ui/SkillTag";
 import { formatDate } from "@/lib/utils";
-import { ChevronRight, ArrowLeft, Pencil, Users, LayoutList, Share2, Plus, FileText, X, Search, Trash2, Building2, Landmark, Crown, Store, Headset, Handshake, Info } from "lucide-react";
+import { ChevronRight, ArrowLeft, Pencil, Users, LayoutList, Share2, Plus, FileText, X, Search, Trash2, Building2, Landmark, Crown, Store, Headset, Handshake, Info, CheckCircle2 } from "lucide-react";
 
 export default function ProjectDetails() {
   const router = useRouter();
@@ -484,7 +484,7 @@ export default function ProjectDetails() {
                   />
                 </div>
                 
-                <div className="flex flex-col gap-0.5 max-h-48 overflow-y-auto bg-transparent py-1.5 -mx-1 px-1">
+                <div className="flex flex-col gap-0.5 h-64 overflow-y-auto bg-transparent py-1.5 -mx-1 px-1">
                   {availableUsers.length === 0 && (
                     <p className="text-sm text-text-secondary text-center py-4">No available members to add.</p>
                   )}
@@ -678,28 +678,28 @@ export default function ProjectDetails() {
                 }}
                 className="w-full pl-9 pr-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
               />
-            </div>
             
-            {stakeholderSearchQuery && stakeholderForm.isCustom && (
-              <div className="flex flex-col gap-1 max-h-40 overflow-y-auto bg-page-bg/30 p-1 rounded-md border border-border-color/30">
-                {availableUsersForStakeholders
-                  .filter(u => u.name.toLowerCase().includes(stakeholderSearchQuery.toLowerCase()))
-                  .slice(0, 5)
-                  .map(u => (
-                    <div 
-                      key={u.id}
-                      onClick={() => {
-                        setStakeholderSearchQuery(u.name);
-                        setStakeholderForm({...stakeholderForm, name: u.name, isCustom: false, id: u.id});
-                      }}
-                      className="flex items-center gap-3 p-2 rounded-md cursor-pointer hover:bg-page-bg text-text-primary transition-colors text-sm"
-                    >
-                      <UserAvatar user={u} size="sm" />
-                      <span>{u.name} <span className="text-xs text-text-secondary ml-1">({u.role})</span></span>
-                    </div>
-                  ))}
-              </div>
-            )}
+              {stakeholderSearchQuery && stakeholderForm.isCustom && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 z-50 flex flex-col gap-1 max-h-48 overflow-y-auto bg-surface/95 backdrop-blur-xl p-1.5 rounded-xl border border-primary/10 shadow-[0_12px_40px_rgb(0,0,0,0.08)] animate-in fade-in slide-in-from-top-2 duration-200">
+                  {availableUsersForStakeholders
+                    .filter(u => u.name.toLowerCase().includes(stakeholderSearchQuery.toLowerCase()))
+                    .slice(0, 5)
+                    .map(u => (
+                      <div 
+                        key={u.id}
+                        onClick={() => {
+                          setStakeholderSearchQuery(u.name);
+                          setStakeholderForm({...stakeholderForm, name: u.name, isCustom: false, id: u.id});
+                        }}
+                        className="flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-page-bg text-text-primary transition-colors text-sm"
+                      >
+                        <UserAvatar user={u} size="sm" />
+                        <span>{u.name} <span className="text-xs text-text-secondary ml-1">({u.role})</span></span>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
             
           </div>
 
@@ -720,12 +720,25 @@ export default function ProjectDetails() {
             />
           </div>
 
-          {stakeholderForm.isCustom && stakeholderSearchQuery && (
-            <div className="bg-primary/5 text-primary text-xs p-3 rounded-md border border-primary/10 flex items-start gap-2">
-              <Share2 className="w-4 h-4 shrink-0 mt-0.5" />
-              <p>You are adding <b>{stakeholderForm.name}</b> as an <b>External Stakeholder</b>. They will not have login access to the system.</p>
-            </div>
-          )}
+          {/* Message Area - Always present to prevent layout jumps */}
+          <div className="min-h-[58px] flex items-center">
+            {stakeholderForm.isCustom && stakeholderSearchQuery ? (
+              <div className="bg-primary/5 text-primary text-xs p-3 rounded-md border border-primary/10 flex items-start gap-2 w-full shadow-sm transition-all">
+                <Share2 className="w-4 h-4 shrink-0 mt-0.5" />
+                <p>You are adding <b>{stakeholderForm.name}</b> as an <b>External Stakeholder</b>. They will not have login access.</p>
+              </div>
+            ) : !stakeholderForm.isCustom && stakeholderForm.name ? (
+              <div className="bg-success/5 text-success text-xs p-3 rounded-md border border-success/20 flex items-start gap-2 w-full shadow-sm transition-all">
+                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+                <p>You selected <b>{stakeholderForm.name}</b>, an existing system member.</p>
+              </div>
+            ) : (
+              <div className="bg-primary/5 text-primary text-xs p-3 rounded-md border border-primary/10 flex items-start gap-2 w-full shadow-sm transition-all">
+                <Info className="w-4 h-4 shrink-0 mt-0.5 opacity-80" />
+                <p>Type a name for an external stakeholder, or select from the dropdown.</p>
+              </div>
+            )}
+          </div>
 
           <div className="mt-4 flex justify-end gap-3">
             <button type="button" onClick={() => {

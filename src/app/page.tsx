@@ -52,7 +52,7 @@ export default function Dashboard() {
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
         
         {/* Total Tasks */}
-        <div className="relative overflow-hidden rounded-2xl p-5 bg-surface border shadow-[0_1px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300 group border-border-color">
+        <div className="relative overflow-hidden rounded-2xl p-5 bg-surface shadow-[0_1px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300 group">
           <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full opacity-[0.03] group-hover:scale-110 group-hover:opacity-[0.05] transition-all duration-500" style={{ background: 'radial-gradient(circle, var(--color-primary), transparent)' }}></div>
           <div className="flex items-start justify-between relative z-10">
             <div>
@@ -68,7 +68,7 @@ export default function Dashboard() {
         </div>
 
         {/* In Progress */}
-        <div className="relative overflow-hidden rounded-2xl p-5 bg-surface border shadow-[0_1px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300 group border-border-color">
+        <div className="relative overflow-hidden rounded-2xl p-5 bg-surface shadow-[0_1px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300 group">
           <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full opacity-[0.04] group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500" style={{ background: 'radial-gradient(circle, var(--color-warning), transparent)' }}></div>
           <div className="flex items-start justify-between relative z-10">
             <div>
@@ -84,7 +84,7 @@ export default function Dashboard() {
         </div>
 
         {/* Overdue */}
-        <div className="relative overflow-hidden rounded-2xl p-5 bg-surface border shadow-[0_1px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300 group border-border-color">
+        <div className="relative overflow-hidden rounded-2xl p-5 bg-surface shadow-[0_1px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300 group">
           <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full opacity-[0.04] group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500" style={{ background: 'radial-gradient(circle, var(--color-danger), transparent)' }}></div>
           <div className="flex items-start justify-between relative z-10">
             <div>
@@ -100,7 +100,7 @@ export default function Dashboard() {
         </div>
 
         {/* Hours This Month */}
-        <div className="relative overflow-hidden rounded-2xl p-5 bg-surface border shadow-[0_1px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300 group border-border-color">
+        <div className="relative overflow-hidden rounded-2xl p-5 bg-surface shadow-[0_1px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.06)] transition-all duration-300 group">
           <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full opacity-[0.04] group-hover:scale-110 group-hover:opacity-[0.06] transition-all duration-500" style={{ background: 'radial-gradient(circle, var(--color-success), transparent)' }}></div>
           <div className="flex items-start justify-between relative z-10">
             <div>
@@ -270,7 +270,7 @@ export default function Dashboard() {
               </div>
             );
           })}
-          <div className="p-3 bg-page-bg text-center rounded-b-lg border-t border-border-color/30">
+          <div className="p-3 bg-page-bg text-center rounded-b-lg">
             <button onClick={() => router.push('/activities')} className="w-full cursor-pointer text-sm text-primary font-medium hover:underline">
               View all activities
             </button>

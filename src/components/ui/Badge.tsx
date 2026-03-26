@@ -6,26 +6,26 @@ export function StatusBadge({ status }: { status: TaskStatus | ProjectStatus | "
   switch (status) {
     case "To Do":
     case "Closed":
-      colorClass = "bg-text-secondary/10 text-text-secondary";
+      colorClass = "bg-slate-500 text-white";
       break;
     case "In Progress":
     case "Active":
-      colorClass = "bg-primary/10 text-primary";
+      colorClass = "bg-primary text-white";
       break;
     case "Pending":
     case "Busy":
-      colorClass = "bg-warning/20 text-warning";
+      colorClass = "bg-warning text-amber-950 font-black";
       break;
     case "On Hold":
-      colorClass = "bg-text-secondary/10 text-text-secondary";
+      colorClass = "bg-slate-500 text-white";
       break;
     case "No Specs":
     case "Overloaded":
-      colorClass = "bg-danger/10 text-danger";
+      colorClass = "bg-danger text-white";
       break;
     case "Completed":
     case "Available":
-      colorClass = "bg-success/10 text-success";
+      colorClass = "bg-success text-white";
       break;
   }
 
