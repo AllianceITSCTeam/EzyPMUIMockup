@@ -1,22 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { StatusBadge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { ApplicationInput } from "@/components/ui/ApplicationInput";
 import { useStore } from "@/store/useStore";
 import { THEME_COLORS } from "@/lib/mockData";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
-import { Search, Filter, Calendar as CalendarIcon, PieChart, Users, Plus, LayoutGrid, List, AlignLeft, FolderKanban, X, Building2 } from "lucide-react";
-import { EstimateSource, Project, ProjectStatus } from "@/types";
+import { Search, Filter, Calendar as CalendarIcon, PieChart, Users, Plus, LayoutGrid, List, AlignLeft, FolderKanban, X, Building2, Paperclip, Trash2, FileText } from "lucide-react";
+import { EstimateSource, Project, ProjectStatus, SpecFile } from "@/types";
 
 export default function ProjectsList() {
-  const { projects, tasks, users, addProject, logActivity, addToast } = useStore();
+  const { projects, tasks, users, companies, addProject, logActivity, addToast } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Form State
   const [name, setName] = useState("");
@@ -34,6 +40,11 @@ export default function ProjectsList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortOption, setSortOption] = useState("Newest");
+  
+  const [oneDeskId, setOneDeskId] = useState("");
+  const [specFiles, setSpecFiles] = useState<SpecFile[]>([]);
+  const [companyIds, setCompanyIds] = useState<string[]>([]);
+  const [applications, setApplications] = useState<string[]>([]);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +66,10 @@ export default function ProjectsList() {
       taskCount: 0,
       themeColor,
       avatarUrl: avatarUrl ? avatarUrl : undefined,
+      oneDeskId,
+      specFiles,
+      companyIds,
+      applications,
       stakeholders: stakeholders,
     };
 
@@ -65,6 +80,7 @@ export default function ProjectsList() {
     // Reset and close
     setName(""); setDescription(""); setEstHours(""); setEndDate(""); setAvatarUrl("");
     setStatus("Active");
+    setOneDeskId(""); setSpecFiles([]); setCompanyIds([]); setApplications([]);
     setStakeholders([]); setNewStakeholderId("");
     setThemeColor(THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]);
     setIsModalOpen(false);
@@ -94,6 +110,14 @@ export default function ProjectsList() {
         return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
     }
   });
+
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center p-12 h-full text-text-secondary">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -251,7 +275,7 @@ export default function ProjectsList() {
       </div>
 
       {/* MODAL */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Project">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Project" className="max-w-2xl">
         <form onSubmit={handleCreate} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Project Name <span className="text-danger">*</span></label>
@@ -292,6 +316,54 @@ export default function ProjectsList() {
               />
             </div>
           </div>
+          
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-text-primary">One Desk #</label>
+            <input 
+              type="text" value={oneDeskId} onChange={e => setOneDeskId(e.target.value)}
+              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary h-[38px]"
+              placeholder="E.g. OND-1234"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-text-primary">Companies</label>
+            <div className="relative">
+              <CustomSelect 
+                value=""
+                onChange={(val: any) => {
+                  if (val && !companyIds.includes(val)) setCompanyIds([...companyIds, val]);
+                }}
+                options={[
+                  { value: "", label: "Select Company..." },
+                  ...companies.filter(c => !companyIds.includes(c.id)).map(c => ({ value: c.id, label: c.name }))
+                ]}
+              />
+            </div>
+          </div>
+          
+          {companyIds.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-[-8px]">
+              {companyIds.map(id => {
+                const comp = companies.find(c => c.id === id);
+                if (!comp) return null;
+                return (
+                  <div key={id} className="flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-md text-[13px] font-medium border border-primary/20">
+                    <Building2 className="w-3.5 h-3.5" />
+                    {comp.name}
+                    <button type="button" onClick={() => setCompanyIds(prev => prev.filter(cId => cId !== id))} className="hover:text-danger ml-1">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-1.5 mt-2">
+            <label className="text-sm font-medium text-text-primary">Applications</label>
+            <ApplicationInput applications={applications} onChange={setApplications} />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-primary">Estimate Type</label>
@@ -387,6 +459,52 @@ export default function ProjectsList() {
               </div>
             </div>
           </div>
+
+          <div className="flex flex-col gap-1.5 mt-2">
+            <label className="text-sm font-medium text-text-primary flex items-center justify-between">
+              <span>Spec Files</span>
+              <label className="cursor-pointer text-primary hover:text-primary/80 flex items-center gap-1 text-xs font-semibold">
+                <Paperclip className="w-3.5 h-3.5" /> Attach Files
+                <input 
+                  type="file" multiple className="hidden" 
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      const newFiles = Array.from(e.target.files).map(f => ({ name: f.name, url: URL.createObjectURL(f), size: f.size }));
+                      setSpecFiles(prev => [...prev, ...newFiles]);
+                    }
+                  }} 
+                />
+              </label>
+            </label>
+            {specFiles.length > 0 && (
+              <div className="flex flex-col gap-2 mt-1">
+                {specFiles.map((file, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-surface/50 px-3 py-2.5 rounded-md shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] border border-transparent">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                       <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center shrink-0">
+                         <FileText className="w-4 h-4 text-primary" />
+                       </div>
+                       <div className="flex flex-col truncate">
+                         <a href={file.url} target="_blank" rel="noreferrer" className="text-sm font-medium text-text-primary hover:text-primary hover:underline truncate">{file.name}</a>
+                         <span className="text-[11px] text-text-secondary">{file.size ? (file.size / 1024).toFixed(1) + ' KB' : 'Unknown size'}</span>
+                       </div>
+                    </div>
+                    <button type="button" onClick={() => setSpecFiles(prev => prev.filter((_, i) => i !== idx))} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded transition-colors shrink-0">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {specFiles.length === 0 && (
+              <div className="border border-dashed border-border-color/30 rounded-lg p-6 flex flex-col items-center justify-center text-text-secondary bg-page-bg/30">
+                <Paperclip className="w-8 h-8 opacity-40 mb-2" />
+                <p className="text-sm text-text-primary font-medium">No files attached</p>
+                <p className="text-xs text-text-secondary">Click 'Attach Files' to upload specs</p>
+              </div>
+            )}
+          </div>
+
 
           <div className="flex flex-col gap-1.5 mt-2">
             <label className="text-sm font-medium text-text-primary">Theme Color</label>

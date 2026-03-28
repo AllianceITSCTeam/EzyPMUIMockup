@@ -24,6 +24,14 @@ export default function Dashboard() {
     setMounted(true);
   }, []);
 
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center p-12 h-64 text-text-secondary">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   const filteredTasks = tasks.filter((t) => {
     if (activeTab === "Current Tasks") return t.status === "In Progress" || t.status === "To Do";
     if (activeTab === "Pending Tasks") return t.status === "Pending" || t.status === "On Hold" || t.status === "No Specs";
@@ -196,15 +204,18 @@ export default function Dashboard() {
                 <tr className="bg-page-bg text-text-secondary text-xs uppercase">
                   <th className="px-6 py-3 font-medium">Task Name</th>
                   <th className="px-6 py-3 font-medium">Project</th>
+                  <th className="px-6 py-3 font-medium">One Desk #</th>
                   <th className="px-6 py-3 font-medium">Status</th>
-                  <th className="px-6 py-3 font-medium">Est</th>
-                  <th className="px-6 py-3 font-medium">Act</th>
-                  <th className="px-6 py-3 font-medium">Due Date</th>
+                  <th className="px-6 py-3 font-medium">Assignee</th>
+                  <th className="px-6 py-3 font-medium">Priority</th>
+                  <th className="px-6 py-3 font-medium">Est / Act</th>
+                  <th className="px-6 py-3 font-medium min-w-[200px]">Start - Due Date</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
                 {filteredTasks.map((task) => {
                   const taskProject = projects.find(p => p.id === task.projectId);
+                  const assignee = users.find(u => u.id === task.assigneeId);
                   return (
                     <tr 
                       key={task.id} 
@@ -212,18 +223,33 @@ export default function Dashboard() {
                     >
                       <td className="px-6 py-3 font-medium text-text-primary hover:underline cursor-pointer" onClick={() => router.push(`/tasks/${task.id}`)}>{task.title}</td>
                       <td className="px-6 py-3 text-text-secondary">{taskProject?.name || "N/A"}</td>
+                      <td className="px-6 py-3 text-text-secondary font-medium">
+                        {task.oneDeskId || <span className="opacity-50">—</span>}
+                      </td>
                       <td className="px-6 py-3"><StatusBadge status={task.status as TaskStatus} /></td>
-                      <td className="px-6 py-3 text-text-secondary">{task.estimateHours}h</td>
-                      <td className="px-6 py-3 text-text-secondary">{task.actualHours}h</td>
                       <td className="px-6 py-3">
-                        <DateProgressBar startDate={task.startDate} dueDate={task.dueDate} />
+                        {assignee ? (
+                          <div className="flex items-center gap-2">
+                            <UserAvatar user={assignee} size="sm" />
+                            <span className="text-text-primary text-[13px] truncate max-w-[120px] font-medium">{assignee.name}</span>
+                          </div>
+                        ) : (
+                          <span className="text-text-secondary text-sm italic">—</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-3 text-text-secondary font-medium text-[13px]">{task.priority}</td>
+                      <td className="px-6 py-3 text-text-secondary">
+                        <span className="font-medium text-text-primary">{task.estimateHours}h</span> / {task.actualHours}h
+                      </td>
+                      <td className="px-6 py-3">
+                        <DateProgressBar startDate={task.startDate} dueDate={task.dueDate} showBothDates={true} />
                       </td>
                     </tr>
                   );
                 })}
                 {filteredTasks.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-text-secondary italic">
+                    <td colSpan={8} className="px-6 py-8 text-center text-text-secondary italic">
                       No tasks found in {activeTab}.
                     </td>
                   </tr>

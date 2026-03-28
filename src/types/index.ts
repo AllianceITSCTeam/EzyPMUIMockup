@@ -27,6 +27,12 @@ export interface ProjectResource {
   role: string; // e.g. FE, BE, QC, BA, PM, Fullstack
 }
 
+export interface SpecFile {
+  name: string;
+  url: string;
+  size?: number; // In bytes
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -46,6 +52,10 @@ export interface Project {
   stakeholders?: ProjectStakeholder[];
   themeColor?: string;
   avatarUrl?: string;
+  oneDeskId?: string;
+  specFiles?: SpecFile[];
+  companyIds?: string[];
+  applications?: string[];
 }
 
 export type TaskStatus = string; // Originally: "To Do" | "In Progress" | "Pending" | "On Hold" | "No Specs" | "Completed" | "Closed";
@@ -87,6 +97,7 @@ export interface Task {
   dueDate: string;
   parentId?: string; // For subtasks
   timeLogs?: TaskTimeLog[];
+  oneDeskId?: string; // One Desk #
 }
 
 export interface ActivityLog {
@@ -116,4 +127,15 @@ export interface Comment {
   userId: string;
   content: string;
   timestamp: string;
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  taxCode?: string;
+  website?: string;
+  logoUrl?: string;
 }

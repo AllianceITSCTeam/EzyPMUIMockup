@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Task, Project, User, ActivityLog, TaskStatus, Comment, Stakeholder, StakeholderRole, TaskStatusConfig, TaskPriorityConfig } from "../types";
-import { MOCK_TASKS, MOCK_PROJECTS, MOCK_USERS, MOCK_ACTIVITIES, MOCK_COMMENTS, MOCK_SYSTEM_STAKEHOLDERS, MOCK_STAKEHOLDER_ROLES, MOCK_TASK_STATUSES, MOCK_TASK_PRIORITIES } from "../lib/mockData";
+import { Task, Project, User, ActivityLog, TaskStatus, Comment, Stakeholder, StakeholderRole, TaskStatusConfig, TaskPriorityConfig, Company } from "../types";
+import { MOCK_TASKS, MOCK_PROJECTS, MOCK_USERS, MOCK_ACTIVITIES, MOCK_COMMENTS, MOCK_SYSTEM_STAKEHOLDERS, MOCK_STAKEHOLDER_ROLES, MOCK_TASK_STATUSES, MOCK_TASK_PRIORITIES, MOCK_COMPANIES } from "../lib/mockData";
 
 export type ToastType = "success" | "error" | "info" | "warning";
 export interface Toast {
@@ -65,6 +65,10 @@ interface AppState {
   addTaskPriority: (priority: TaskPriorityConfig) => void;
   updateTaskPriority: (id: string, updates: Partial<TaskPriorityConfig>) => void;
   deleteTaskPriority: (id: string) => void;
+  companies: Company[];
+  addCompany: (comp: Company) => void;
+  updateCompany: (id: string, updates: Partial<Company>) => void;
+  deleteCompany: (id: string) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -79,6 +83,7 @@ export const useStore = create<AppState>()(
       stakeholderRoles: MOCK_STAKEHOLDER_ROLES,
       taskStatuses: MOCK_TASK_STATUSES,
       taskPriorities: MOCK_TASK_PRIORITIES,
+      companies: MOCK_COMPANIES,
       toasts: [],
       isLoading: true, // Start loading
       currentUser: null, // Will be hydrated from localStorage or fallback
@@ -233,6 +238,18 @@ export const useStore = create<AppState>()(
 
       deleteTaskPriority: (id) => set((state) => ({
         taskPriorities: state.taskPriorities.filter(p => p.id !== id)
+      })),
+
+      addCompany: (comp) => set((state) => ({
+        companies: [...state.companies, comp]
+      })),
+
+      updateCompany: (id, updates) => set((state) => ({
+        companies: state.companies.map(c => c.id === id ? { ...c, ...updates } : c)
+      })),
+
+      deleteCompany: (id) => set((state) => ({
+        companies: state.companies.filter(c => c.id !== id)
       })),
 
       addUser: (user) => set((state) => ({

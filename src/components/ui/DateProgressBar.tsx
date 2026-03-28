@@ -55,15 +55,18 @@ export const DateProgressBar = ({ startDate, dueDate, showBothDates = false }: D
 
   return (
     <div className={`flex flex-col gap-1.5 w-full ${!showBothDates ? 'min-w-[120px] max-w-[150px]' : ''}`} title={`Start: ${formatDate(startDate)} | Due: ${formatDate(dueDate)}`}>
-      <div className={`flex items-center text-[11px] font-medium leading-none ${showBothDates ? 'justify-between' : ''}`}>
-        {showBothDates && (
-          <span className="text-text-secondary">
-            {formatDate(startDate)}
+      <div className="flex items-center text-[11px] font-medium leading-none text-text-primary gap-1">
+        {showBothDates ? (
+          <>
+            <span className="text-text-secondary">{formatDate(startDate)}</span>
+            <span className="text-text-secondary">-</span>
+            <span className={percentage >= 100 ? "text-danger font-bold" : ""}>{formatDate(dueDate)}</span>
+          </>
+        ) : (
+          <span className={percentage >= 100 ? "text-danger font-bold" : "text-text-primary"}>
+            {formatDate(dueDate)}
           </span>
         )}
-        <span className={percentage >= 100 ? "text-danger font-bold" : "text-text-primary"}>
-           {formatDate(dueDate)}
-        </span>
       </div>
       <div className={`w-full h-1.5 ${bgClass} rounded-full overflow-hidden`}>
         <div 

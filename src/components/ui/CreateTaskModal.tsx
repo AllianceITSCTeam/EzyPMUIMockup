@@ -23,6 +23,7 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus>("To Do");
   const [newTaskStartDate, setNewTaskStartDate] = useState(new Date().toISOString().split("T")[0]);
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
+  const [newTaskOneDeskId, setNewTaskOneDeskId] = useState("");
 
   useEffect(() => {
     if (isOpen) {
@@ -36,6 +37,7 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
       setNewTaskPriority("Medium");
       setNewTaskStartDate(new Date().toISOString().split("T")[0]);
       setNewTaskDueDate("");
+      setNewTaskOneDeskId("");
     }
   }, [isOpen, defaultProjectId, defaultAssigneeId, projects]);
 
@@ -55,6 +57,7 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
       actualHours: 0,
       startDate: newTaskStartDate,
       dueDate: newTaskDueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      oneDeskId: newTaskOneDeskId || undefined,
     };
 
     addTask(newTask);
@@ -137,16 +140,26 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
             />
           </div>
         </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-text-primary">Assignee</label>
-          <CustomSelect 
-            value={newTaskAssignee} 
-            onChange={(val: any) => setNewTaskAssignee(val)}
-            options={[
-              { value: "", label: "Unassigned" },
-              ...users.map(u => ({ value: u.id, label: u.name }))
-            ]}
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-text-primary">One Desk #</label>
+            <input 
+              type="text" value={newTaskOneDeskId} onChange={e => setNewTaskOneDeskId(e.target.value)}
+              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary h-[38px]"
+              placeholder="e.g. OND-1234"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-text-primary">Assignee</label>
+            <CustomSelect 
+              value={newTaskAssignee} 
+              onChange={(val: any) => setNewTaskAssignee(val)}
+              options={[
+                { value: "", label: "Unassigned" },
+                ...users.map(u => ({ value: u.id, label: u.name }))
+              ]}
+            />
+          </div>
         </div>
         
         <div className="mt-6 flex justify-end gap-3">

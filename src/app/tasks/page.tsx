@@ -156,6 +156,14 @@ function TasksListContent() {
     }
   };
 
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center p-12 h-full text-text-secondary">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 w-full h-full">
       <div className="flex justify-between items-center shrink-0 mb-2">
@@ -262,10 +270,11 @@ function TasksListContent() {
                 <tr>
                   <th className="px-6 py-3 font-medium">Task Name</th>
                   <th className="px-6 py-3 font-medium">Project</th>
+                  <th className="px-6 py-3 font-medium">One Desk #</th>
                   <th className="px-6 py-3 font-medium">Assignee</th>
                   <th className="px-6 py-3 font-medium">Priority</th>
                   <th className="px-6 py-3 font-medium">Est / Act</th>
-                  <th className="px-6 py-3 font-medium">Due Date</th>
+                  <th className="px-6 py-3 font-medium min-w-[200px]">Start - Due Date</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
@@ -291,6 +300,9 @@ function TasksListContent() {
                         </div>
                       </td>
                       <td className="px-6 py-3 text-text-secondary">{project?.name}</td>
+                      <td className="px-6 py-3 text-text-secondary font-medium">
+                        {task.oneDeskId || <span className="opacity-50">—</span>}
+                      </td>
                       <td className="px-6 py-3">
                         {assignee ? (
                           <div className="flex items-center gap-2">
@@ -314,7 +326,7 @@ function TasksListContent() {
                         </div>
                       </td>
                       <td className="px-6 py-3">
-                        <DateProgressBar startDate={task.startDate} dueDate={task.dueDate} />
+                        <DateProgressBar startDate={task.startDate} dueDate={task.dueDate} showBothDates={true} />
                       </td>
                     </tr>
                   );

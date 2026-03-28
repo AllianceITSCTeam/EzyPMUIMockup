@@ -8,15 +8,16 @@ import { Settings, Users, Shield, Plus, Edit, Trash2, Building2, Briefcase, Serv
 
 export default function SettingsPage() {
   const { 
-    systemStakeholders, stakeholderRoles, taskStatuses, taskPriorities,
+    systemStakeholders, stakeholderRoles, taskStatuses, taskPriorities, companies,
     addSystemStakeholder, updateSystemStakeholder, deleteSystemStakeholder,
     addStakeholderRole, updateStakeholderRole, deleteStakeholderRole,
     addTaskStatus, updateTaskStatusConfig, deleteTaskStatus,
     addTaskPriority, updateTaskPriority, deleteTaskPriority,
+    addCompany, updateCompany, deleteCompany,
     addToast, logActivity
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState<"stakeholders" | "roles" | "task-statuses" | "task-priorities">("stakeholders");
+  const [activeTab, setActiveTab] = useState<"stakeholders" | "roles" | "task-statuses" | "task-priorities" | "companies">("stakeholders");
 
   // Multi-purpose Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,6 +34,13 @@ export default function SettingsPage() {
   const [genericName, setGenericName] = useState("");
   const [genericDesc, setGenericDesc] = useState("");
   const [genericColor, setGenericColor] = useState("#3b82f6");
+
+  // Form Fields - Company
+  const [compAddress, setCompAddress] = useState("");
+  const [compPhone, setCompPhone] = useState("");
+  const [compEmail, setCompEmail] = useState("");
+  const [compTaxCode, setCompTaxCode] = useState("");
+  const [compWebsite, setCompWebsite] = useState("");
 
   const getRoleIcon = (name: string) => {
     switch (name.toLowerCase()) {
@@ -93,6 +101,20 @@ export default function SettingsPage() {
       } else {
         setGenericName(""); setGenericDesc(""); setGenericColor("#3b82f6");
       }
+    } else if (activeTab === "companies") {
+      if (mode === "edit" && id) {
+        const target = companies.find(c => c.id === id);
+        if (target) {
+          setGenericName(target.name);
+          setCompAddress(target.address || "");
+          setCompPhone(target.phone || "");
+          setCompEmail(target.email || "");
+          setCompTaxCode(target.taxCode || "");
+          setCompWebsite(target.website || "");
+        }
+      } else {
+        setGenericName(""); setCompAddress(""); setCompPhone(""); setCompEmail(""); setCompTaxCode(""); setCompWebsite("");
+      }
     }
     setIsModalOpen(true);
   };
@@ -143,6 +165,17 @@ export default function SettingsPage() {
         updateTaskPriority(editingId, { name: genericName, description: genericDesc, color: genericColor });
         addToast("success", `Task Priority ${genericName} updated`);
       }
+    } else if (activeTab === "companies") {
+      if (!genericName) return;
+      if (modalMode === "add") {
+        addCompany({ id: `comp-${Date.now()}`, name: genericName, address: compAddress, phone: compPhone, email: compEmail, taxCode: compTaxCode, website: compWebsite });
+        addToast("success", `Company ${genericName} created`);
+        logActivity(`Created company configuration: ${genericName}`);
+      } else if (editingId) {
+        updateCompany(editingId, { name: genericName, address: compAddress, phone: compPhone, email: compEmail, taxCode: compTaxCode, website: compWebsite });
+        addToast("success", `Company ${genericName} updated`);
+        logActivity(`Updated company configuration: ${genericName}`);
+      }
     }
 
     setIsModalOpen(false);
@@ -166,6 +199,10 @@ export default function SettingsPage() {
       deleteTaskPriority(id);
       addToast("info", `Task priority ${name} deleted`);
       logActivity(`Deleted task priority: ${name}`);
+    } else if (activeTab === "companies") {
+      deleteCompany(id);
+      addToast("info", `Company ${name} deleted`);
+      logActivity(`Deleted company configuration: ${name}`);
     }
   };
 
@@ -181,7 +218,7 @@ export default function SettingsPage() {
           className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add {activeTab === "stakeholders" ? "Stakeholder" : activeTab === "roles" ? "Role" : activeTab === "task-statuses" ? "Status" : "Priority"}
+          Add {activeTab === "stakeholders" ? "Stakeholder" : activeTab === "roles" ? "Role" : activeTab === "task-statuses" ? "Status" : activeTab === "companies" ? "Company" : "Priority"}
         </button>
       </div>
 
@@ -222,6 +259,15 @@ export default function SettingsPage() {
           <span className="w-3 h-3 rounded-full bg-orange-500"></span>
           Task Priorities
         </button>
+        <button
+          onClick={() => setActiveTab("companies")}
+          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
+            activeTab === "companies" ? "border-primary text-primary" : "border-transparent text-text-secondary hover:text-text-primary"
+          }`}
+        >
+          <Building2 className="w-4 h-4" />
+          Companies Profile
+        </button>
       </div>
 
       <Card className="flex flex-col flex-1 overflow-hidden min-h-[400px]">
@@ -240,6 +286,13 @@ export default function SettingsPage() {
                 <tr>
                   <th className="px-6 py-3 font-medium w-1/4">Role Name</th>
                   <th className="px-6 py-3 font-medium w-2/3">Description</th>
+                  <th className="px-6 py-3 font-medium text-right w-24">Actions</th>
+                </tr>
+              ) : activeTab === "companies" ? (
+                <tr>
+                  <th className="px-6 py-3 font-medium w-64">Company Name & Website</th>
+                  <th className="px-6 py-3 font-medium">Contact</th>
+                  <th className="px-6 py-3 font-medium">Tax Code</th>
                   <th className="px-6 py-3 font-medium text-right w-24">Actions</th>
                 </tr>
               ) : (
@@ -319,6 +372,25 @@ export default function SettingsPage() {
                 </td>
               </tr>
             ))}
+            {activeTab === "companies" && companies.map(comp => (
+              <tr key={comp.id} className="hover:bg-page-bg/50 transition-colors group">
+                <td className="px-6 py-4 font-medium flex flex-col">
+                  <span>{comp.name}</span>
+                  {comp.website && <span className="text-xs text-text-secondary mt-0.5">{comp.website}</span>}
+                </td>
+                <td className="px-6 py-4">
+                  <div>{comp.email || "-"}</div>
+                  {comp.phone && <div className="text-xs text-text-secondary mt-0.5">{comp.phone}</div>}
+                </td>
+                <td className="px-6 py-4 text-text-secondary">{comp.taxCode || "-"}</td>
+                <td className="px-6 py-4 text-right">
+                  <div className="flex justify-end gap-2">
+                    <button onClick={() => openModal("edit", comp.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(comp.id, comp.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                </td>
+              </tr>
+            ))}
             {/* Empty States */}
             {activeTab === "stakeholders" && systemStakeholders.length === 0 && (
               <tr><td colSpan={5} className="px-6 py-8 text-center text-text-secondary">No stakeholders found. Add one to get started.</td></tr>
@@ -331,6 +403,9 @@ export default function SettingsPage() {
             )}
             {activeTab === "task-priorities" && taskPriorities.length === 0 && (
               <tr><td colSpan={4} className="px-6 py-8 text-center text-text-secondary">No task priorities found.</td></tr>
+            )}
+            {activeTab === "companies" && companies.length === 0 && (
+              <tr><td colSpan={4} className="px-6 py-8 text-center text-text-secondary">No companies configured. Add a company profile to get started.</td></tr>
             )}
           </tbody>
         </table>
@@ -364,6 +439,49 @@ export default function SettingsPage() {
                 <input type="text" value={shOrg} onChange={e => setShOrg(e.target.value)}
                   className="px-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
                 />
+              </div>
+            </>
+          ) : activeTab === "companies" ? (
+            <>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">Company Name *</label>
+                <input type="text" required value={genericName} onChange={e => setGenericName(e.target.value)}
+                  className="px-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-text-primary">Email</label>
+                  <input type="email" value={compEmail} onChange={e => setCompEmail(e.target.value)}
+                    className="px-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-text-primary">Phone</label>
+                  <input type="tel" value={compPhone} onChange={e => setCompPhone(e.target.value)}
+                    className="px-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">Address</label>
+                <input type="text" value={compAddress} onChange={e => setCompAddress(e.target.value)}
+                  className="px-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-text-primary">Tax Code</label>
+                  <input type="text" value={compTaxCode} onChange={e => setCompTaxCode(e.target.value)}
+                    className="px-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-text-primary">Website</label>
+                  <input type="url" value={compWebsite} onChange={e => setCompWebsite(e.target.value)}
+                    className="px-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
+                  />
+                </div>
               </div>
             </>
           ) : (

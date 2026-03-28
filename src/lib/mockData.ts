@@ -1,9 +1,48 @@
-import { User, Project, Task, ActivityLog, Comment, Stakeholder, StakeholderRole, TaskStatusConfig, TaskPriorityConfig } from "../types";
+import { User, Project, Task, ActivityLog, Comment, Stakeholder, StakeholderRole, TaskStatusConfig, TaskPriorityConfig, Company } from "../types";
 
 export const THEME_COLORS = [
   "#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6",
   "#ec4899", "#14b8a6", "#f97316", "#6366f1", "#84cc16",
   "#06b6d4", "#d946ef", "#eab308", "#22c55e", "#a855f7"
+];
+
+export const MOCK_COMPANIES: Company[] = [
+  {
+    id: "comp-1",
+    name: "EzyPM Solutions",
+    address: "Level 4, 11 York St, Sydney NSW 2000",
+    phone: "+61 2 9123 4567",
+    email: "contact@ezypm.com",
+    taxCode: "ABN 12 345 678 901",
+    website: "https://ezypm.com"
+  },
+  {
+    id: "comp-2",
+    name: "Alpha Tech Solutions",
+    address: "123 Innovation Drive, Melbourne VIC 3000",
+    phone: "+61 3 9876 5432",
+    email: "info@alphatech.com.au",
+    taxCode: "ABN 98 765 432 109",
+    website: "https://alphatech.com.au"
+  },
+  {
+    id: "comp-3",
+    name: "Source Funding Pty",
+    address: "55 FinTech Boulevard, Brisbane QLD 4000",
+    phone: "+61 7 1234 5678",
+    email: "partners@sourcefunding.com.au",
+    taxCode: "ABN 45 678 901 234",
+    website: "https://sourcefunding.com.au"
+  },
+  {
+    id: "comp-4",
+    name: "Valuation DB Inc.",
+    address: "88 Data Street, Adelaide SA 5000",
+    phone: "+61 8 8765 4321",
+    email: "contact@valuationdb.com",
+    taxCode: "ABN 32 109 876 543",
+    website: "https://valuationdb.com"
+  }
 ];
 
 const RAW_USERS: any[] = [
@@ -144,6 +183,11 @@ export const MOCK_PROJECTS: Project[] = [
     themeColor: THEME_COLORS[8],
     avatarUrl: "https://debmanagers-ad.sourcefunding.com.au/favicon.ico",
     resources: [{ userId: "u9", role: "BA" }, { userId: "u19", role: "Backend" }, { userId: "u15", role: "Frontend" }, { userId: "u14", role: "QC" }],
+    companyIds: ["comp-3", "comp-1"],
+    specFiles: [
+      { name: "deb-source-requirements.pdf", url: "#", size: 2048576 },
+      { name: "architecture_diagram.png", url: "#", size: 512000 }
+    ],
     stakeholders: [
       { id: "sh-client-3", name: "Internal HR Team", role: "Client", isCustom: true },
       { id: "sh-partner-3", name: "Source Recruitment", role: "Partner", isCustom: true }

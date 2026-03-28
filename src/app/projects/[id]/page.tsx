@@ -10,19 +10,20 @@ import { DateProgressBar } from "@/components/ui/DateProgressBar";
 import { StatusBadge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Modal } from "@/components/ui/Modal";
+import { ApplicationInput } from "@/components/ui/ApplicationInput";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { SkillTag } from "@/components/ui/SkillTag";
 import { formatDate } from "@/lib/utils";
 import { CreateTaskModal } from "@/components/ui/CreateTaskModal";
-import { ChevronRight, ArrowLeft, Pencil, Users, LayoutList, Share2, Plus, FileText, X, Search, Trash2, Building2, Landmark, Crown, Store, Headset, Handshake, Info, CheckCircle2, BarChart2, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronRight, ArrowLeft, Pencil, Users, LayoutList, Share2, Plus, FileText, X, Search, Trash2, Building2, Landmark, Crown, Store, Headset, Handshake, Info, CheckCircle2, BarChart2, ChevronDown, PanelLeftClose, PanelLeftOpen, Paperclip } from "lucide-react";
 
 export default function ProjectDetails() {
   const router = useRouter();
   const params = useParams();
   const projectId = params?.id as string;
-  const { projects, users, tasks, addToast, logActivity, updateProject, addRecentLink, addStakeholder, removeStakeholder, addResourceToProject, removeResourceFromProject } = useStore();
-  const [activeTab, setActiveTab] = useState<"resources" | "tasks" | "gantt" | "stakeholders">("resources");
+  const { projects, users, tasks, companies, addToast, logActivity, updateProject, addRecentLink, addStakeholder, removeStakeholder, addResourceToProject, removeResourceFromProject } = useStore();
+  const [activeTab, setActiveTab] = useState<"gantt" | "tasks" | "resources" | "stakeholders">("gantt");
   const [isAddResourceOpen, setIsAddResourceOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [resourceSearchQuery, setResourceSearchQuery] = useState("");
@@ -75,7 +76,11 @@ export default function ProjectDetails() {
     estimateHours: project?.estimateHours || 0,
     themeColor: project?.themeColor || THEME_COLORS[0],
     avatarUrl: project?.avatarUrl || "",
-    stakeholders: project?.stakeholders || []
+    stakeholders: project?.stakeholders || [],
+    oneDeskId: project?.oneDeskId || "",
+    companyIds: project?.companyIds || [],
+    applications: project?.applications || [],
+    specFiles: project?.specFiles || []
   });
   const [newEditStakeholderId, setNewEditStakeholderId] = useState("");
   const [newEditStakeholderRole, setNewEditStakeholderRole] = useState("Client");
@@ -215,7 +220,11 @@ export default function ProjectDetails() {
                 estimateHours: project.estimateHours,
                 themeColor: project.themeColor || THEME_COLORS[0],
                 avatarUrl: project.avatarUrl || "",
-                stakeholders: project.stakeholders || []
+                stakeholders: project.stakeholders || [],
+                oneDeskId: project.oneDeskId || "",
+                companyIds: project.companyIds || [],
+                applications: project.applications || [],
+                specFiles: project.specFiles || []
               });
               setIsEditModalOpen(true);
             }}
@@ -226,16 +235,82 @@ export default function ProjectDetails() {
         </div>
       </div>
 
-      <div className="flex flex-1 gap-6 overflow-hidden relative">
+      <div className={`flex flex-1 overflow-hidden relative transition-all duration-300 ${isSidebarOpen ? 'gap-6' : 'gap-0'}`}>
         {/* SIDEBAR */}
         <div className={`flex flex-col gap-6 overflow-y-auto transition-all duration-300 shrink-0 ${isSidebarOpen ? 'w-full lg:w-[320px] xl:w-[350px] opacity-100' : 'w-0 opacity-0 overflow-hidden hidden lg:flex'} pr-1`}>
-          <Card className="p-5 flex flex-col gap-4 shadow-sm border-none shrink-0">
-            <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider pb-1">
-              Project Information
-            </h3>
+          <Card className="p-5 flex flex-col gap-4 shadow-sm border-none shrink-0 relative group/sidebar">
+            <div className="flex items-center justify-between pb-1 border-b border-transparent">
+              <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
+                Project Information
+              </h3>
+              <button 
+                onClick={() => setIsSidebarOpen(false)}
+                className="text-text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-page-bg opacity-50 hover:opacity-100"
+                title="Collapse Sidebar"
+              >
+                <PanelLeftClose className="w-4 h-4" />
+              </button>
+            </div>
             <p className="text-sm text-text-secondary leading-relaxed">
               {project.description || "No description provided."}
             </p>
+            
+            {(project.oneDeskId || (project.companyIds && project.companyIds.length > 0)) && (
+              <div className="flex flex-col gap-3 mt-1 pt-3 border-t border-black/5 dark:border-white/5">
+                {project.oneDeskId && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-text-secondary font-medium uppercase tracking-widest">One Desk #</span>
+                    <span className="text-sm font-semibold text-text-primary px-2 py-1 bg-page-bg rounded-md w-fit border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]">{project.oneDeskId}</span>
+                  </div>
+                )}
+                {project.companyIds && project.companyIds.length > 0 && (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-xs text-text-secondary font-medium uppercase tracking-widest">Companies</span>
+                    <div className="flex flex-col gap-1">
+                      {project.companyIds.map(id => {
+                        const comp = companies.find(c => c.id === id);
+                        if (!comp) return null;
+                        return (
+                          <div key={id} className="flex items-center gap-2 text-sm text-text-primary font-medium">
+                            <Building2 className="w-3.5 h-3.5 text-text-secondary" />
+                            {comp.name}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+                {project.applications && project.applications.length > 0 && (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-xs text-text-secondary font-medium uppercase tracking-widest">Applications</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {project.applications.map(app => (
+                        <span key={app} className="px-2 py-0.5 bg-primary/10 border border-primary/20 text-primary text-xs font-semibold rounded shadow-[0_1px_2px_rgb(0,0,0,0.05)]">
+                          {app}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {project.specFiles && project.specFiles.length > 0 && (
+              <div className="flex flex-col gap-2 mt-2 pt-3 border-t border-black/5 dark:border-white/5">
+                <span className="text-xs text-text-secondary font-medium uppercase tracking-widest flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" /> Spec Files
+                </span>
+                <div className="flex flex-col gap-1.5">
+                  {project.specFiles.map((file, idx) => (
+                    <a key={idx} href={file.url} target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-page-bg hover:bg-surface px-2 py-1.5 rounded-md border border-transparent hover:border-border-color transition-all group">
+                       <FileText className="w-4 h-4 text-primary group-hover:scale-110 transition-transform shrink-0" />
+                       <span className="text-sm font-medium text-text-primary group-hover:text-primary transition-colors truncate">{file.name}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-6 mt-2 text-sm">
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-text-secondary font-medium uppercase tracking-widest">Start Date</span>
@@ -293,13 +368,13 @@ export default function ProjectDetails() {
                 {isSidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
               </button>
           <button 
-            onClick={() => setActiveTab("resources")}
+            onClick={() => setActiveTab("gantt")}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === "resources" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
+              activeTab === "gantt" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
             }`}
           >
-            <Users className="w-4 h-4" />
-            Resources
+            <BarChart2 className="w-4 h-4" />
+            Tasks - Gantt
           </button>
           <button 
             onClick={() => setActiveTab("tasks")}
@@ -311,6 +386,15 @@ export default function ProjectDetails() {
             Tasks
           </button>
           <button 
+            onClick={() => setActiveTab("resources")}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              activeTab === "resources" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            Resources
+          </button>
+          <button 
             onClick={() => setActiveTab("stakeholders")}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
               activeTab === "stakeholders" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
@@ -318,15 +402,6 @@ export default function ProjectDetails() {
           >
             <Share2 className="w-4 h-4" />
             Stakeholders
-          </button>
-          <button 
-            onClick={() => setActiveTab("gantt")}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              activeTab === "gantt" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
-            }`}
-          >
-            <BarChart2 className="w-4 h-4" />
-            Tasks - Gantt
           </button>
         </div>
 
@@ -417,29 +492,47 @@ export default function ProjectDetails() {
                   <thead>
                     <tr className="bg-page-bg/50 text-text-secondary text-xs uppercase">
                       <th className="px-6 py-3 font-medium">Task Name</th>
+                      <th className="px-6 py-3 font-medium">One Desk #</th>
                       <th className="px-6 py-3 font-medium">Status</th>
                       <th className="px-6 py-3 font-medium">Priority</th>
+                      <th className="px-6 py-3 font-medium">Resource</th>
                       <th className="px-6 py-3 font-medium">Est / Act</th>
-                      <th className="px-6 py-3 font-medium">Due Date</th>
+                      <th className="px-6 py-3 font-medium min-w-[200px]">Start - Due Date</th>
                     </tr>
                   </thead>
                   <tbody className="text-sm">
-                    {projectTasks.map((task) => (
+                    {projectTasks.map((task) => {
+                      const assignee = users.find(u => u.id === task.assigneeId);
+                      return (
                       <tr key={task.id} className="transition-colors hover:bg-page-bg/50 group cursor-pointer" onClick={() => router.push(`/tasks/${task.id}`)}>
                         <td className="px-6 py-4 font-medium text-text-primary hover:text-primary group-hover:text-primary transition-colors">{task.title}</td>
+                        <td className="px-6 py-4 text-text-secondary font-medium">
+                          {task.oneDeskId || <span className="opacity-50">—</span>}
+                        </td>
                         <td className="px-6 py-4"><StatusBadge status={task.status} /></td>
                         <td className="px-6 py-4 text-text-secondary">{task.priority}</td>
+                        <td className="px-6 py-4">
+                          {assignee ? (
+                            <div className="flex items-center gap-2">
+                              <UserAvatar user={assignee} size="sm" />
+                              <span className="text-sm text-text-primary font-medium truncate max-w-[120px]">{assignee.name}</span>
+                            </div>
+                          ) : (
+                            <span className="text-text-secondary text-sm italic">—</span>
+                          )}
+                        </td>
                         <td className="px-6 py-4 text-text-secondary">
                           <span className="font-medium text-text-primary">{task.estimateHours}h</span> / {task.actualHours}h
                         </td>
                         <td className="px-6 py-4">
-                          <DateProgressBar startDate={task.startDate} dueDate={task.dueDate} />
+                          <DateProgressBar startDate={task.startDate} dueDate={task.dueDate} showBothDates={true} />
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                     {projectTasks.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="px-6 py-8 text-center text-text-secondary italic">No tasks added to this project yet.</td>
+                        <td colSpan={7} className="px-6 py-8 text-center text-text-secondary italic">No tasks added to this project yet.</td>
                       </tr>
                     )}
                   </tbody>
@@ -498,6 +591,13 @@ export default function ProjectDetails() {
                   </h4>
                   <div className="flex items-center gap-2">
                     <button 
+                      onClick={() => setIsCreateTaskOpen(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-surface rounded-md text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Create Task
+                    </button>
+                    <div className="w-px h-5 bg-border-color/50 mx-1"></div>
+                    <button 
                       onClick={() => setGanttExpandedTasks(new Set(projectTasks.map(t => t.id)))}
                       className="px-2.5 py-1 text-[11px] font-medium text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors"
                     >
@@ -519,6 +619,7 @@ export default function ProjectDetails() {
                       <div className="w-[90px] shrink-0">Status</div>
                       <div className="w-[60px] shrink-0">Start</div>
                       <div className="w-[60px] shrink-0">End</div>
+                      <div className="w-[40px] shrink-0 text-right">Act</div>
                     </div>
                     <div className="flex flex-col flex-1 pb-10">
                       {flatTasks.map(t => (
@@ -534,7 +635,16 @@ export default function ProjectDetails() {
                             ) : (
                               <span className="w-5 h-5 shrink-0 -ml-1 mr-1" />
                             )}
-                            <span className={`text-[13px] truncate ${t.depth === 0 ? 'font-bold text-text-primary' : 'font-medium text-text-secondary'}`} title={t.title}>{t.title}</span>
+                            <span 
+                              className={`text-[13px] truncate cursor-pointer hover:text-primary transition-colors hover:underline ${t.depth === 0 ? 'font-bold text-text-primary' : 'font-medium text-text-secondary'}`} 
+                              title={t.title}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/tasks/${t.id}`);
+                              }}
+                            >
+                              {t.title}
+                            </span>
                           </div>
                           <div className="w-[90px] shrink-0 pr-2">
                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${t.status === 'Completed' ? 'bg-success/10 text-success' : t.status === 'In Progress' ? 'bg-primary/10 text-primary' : t.status === 'Pending' ? 'bg-warning/10 text-warning-dark' : 'bg-page-bg text-text-secondary border border-border-color' }`}>
@@ -546,6 +656,15 @@ export default function ProjectDetails() {
                           </div>
                           <div className="w-[60px] shrink-0 text-[11px] text-text-secondary truncate">
                             {t.dueDate ? new Date(t.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "N/A"}
+                          </div>
+                          <div className="w-[30px] shrink-0 flex justify-end">
+                            <button 
+                              onClick={() => router.push(`/tasks/${t.id}`)}
+                              className="text-text-secondary hover:text-primary p-1 rounded hover:bg-primary/10 transition-colors"
+                              title="Edit Task"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </div>
                       ))}
@@ -814,7 +933,7 @@ export default function ProjectDetails() {
       )}
 
       {/* EDIT PROJECT MODAL */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Project">
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Edit Project" className="max-w-2xl">
         <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Project Name *</label>
@@ -930,6 +1049,103 @@ export default function ProjectDetails() {
                 </button>
               </div>
             </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-text-primary">One Desk #</label>
+            <input 
+              type="text" value={editForm.oneDeskId} onChange={e => setEditForm({...editForm, oneDeskId: e.target.value})}
+              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary h-[38px]"
+              placeholder="E.g. OND-1234"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-text-primary">Companies</label>
+            <div className="relative">
+              <CustomSelect 
+                value=""
+                onChange={(val: any) => {
+                  if (val && !editForm.companyIds?.includes(val)) {
+                    setEditForm({...editForm, companyIds: [...(editForm.companyIds || []), val]});
+                  }
+                }}
+                options={[
+                  { value: "", label: "Select Company..." },
+                  ...companies.filter(c => !(editForm.companyIds || []).includes(c.id)).map(c => ({ value: c.id, label: c.name }))
+                ]}
+              />
+            </div>
+          </div>
+          
+          {(editForm.companyIds?.length || 0) > 0 && (
+            <div className="flex flex-wrap gap-2 mt-[-8px]">
+              {editForm.companyIds?.map(id => {
+                const comp = companies.find(c => c.id === id);
+                if (!comp) return null;
+                return (
+                  <div key={id} className="flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-md text-[13px] font-medium border border-primary/20">
+                    <Building2 className="w-3.5 h-3.5" />
+                    {comp.name}
+                    <button type="button" onClick={() => setEditForm({...editForm, companyIds: editForm.companyIds!.filter(cId => cId !== id)})} className="hover:text-danger ml-1">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-1.5 mt-2">
+            <label className="text-sm font-medium text-text-primary">Applications</label>
+            <ApplicationInput 
+              applications={editForm.applications || []} 
+              onChange={(apps: string[]) => setEditForm({ ...editForm, applications: apps })} 
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5 mt-2">
+            <label className="text-sm font-medium text-text-primary flex items-center justify-between">
+              <span>Spec Files <span className="text-text-secondary font-normal">(optional)</span></span>
+              <label className="cursor-pointer text-primary hover:text-primary/80 flex items-center gap-1 text-xs font-semibold">
+                <Paperclip className="w-3.5 h-3.5" /> Attach Files
+                <input 
+                  type="file" multiple className="hidden" 
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      const newFiles = Array.from(e.target.files).map(f => ({ name: f.name, url: URL.createObjectURL(f), size: f.size }));
+                      setEditForm({...editForm, specFiles: [...(editForm.specFiles || []), ...newFiles]});
+                    }
+                  }} 
+                />
+              </label>
+            </label>
+            {(editForm.specFiles?.length || 0) > 0 && (
+              <div className="flex flex-col gap-2 mt-1">
+                {editForm.specFiles?.map((file, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-surface/50 px-3 py-2.5 rounded-md shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] border border-transparent">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                       <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center shrink-0">
+                         <FileText className="w-4 h-4 text-primary" />
+                       </div>
+                       <div className="flex flex-col truncate">
+                         <a href={file.url} target="_blank" rel="noreferrer" className="text-sm font-medium text-text-primary hover:text-primary hover:underline truncate">{file.name}</a>
+                         <span className="text-[11px] text-text-secondary">{file.size ? (file.size / 1024).toFixed(1) + ' KB' : 'Unknown size'}</span>
+                       </div>
+                    </div>
+                    <button type="button" onClick={() => setEditForm({...editForm, specFiles: editForm.specFiles!.filter((_, i) => i !== idx)})} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded transition-colors shrink-0">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {(editForm.specFiles?.length || 0) === 0 && (
+              <div className="border border-dashed border-border-color/30 rounded-lg p-6 flex flex-col items-center justify-center text-text-secondary bg-page-bg/30">
+                <Paperclip className="w-8 h-8 opacity-40 mb-2" />
+                <p className="text-sm text-text-primary font-medium">No files attached</p>
+                <p className="text-xs text-text-secondary">Click 'Attach Files' to upload specs</p>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">

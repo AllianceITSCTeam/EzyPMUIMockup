@@ -1,0 +1,16 @@
+# Core project rules for AI tools
+
+# 1. READ GUIDELINES FIRST
+Before predicting edits, writing code, or generating new components for this project, you MUST read the collaboration guidelines in the `docs/ai-collaboration/` directory.
+
+Especially read:
+- `docs/ai-collaboration/01-ui-components-guidelines.md`
+
+# 2. UI RULES BRIEF SUMMARY
+- EZY PM uses a Borderless, Premium aesthetic.
+- DO NOT use native solid black borders in Tailwind (`border-black`, standard solid `border` without a soft color). Use shadows, background contrast, or very soft borders (e.g., `border-slate-200`) to separate items.
+- Always use the predefined UI components (e.g., `CustomSelect` instead of HTML `<select>`).
+- Buttons must follow the borderless aesthetic (no outline, just background color/ghost hover effects).
+
+# 3. SELF-UPDATING KNOWLEDGE
+If during a chat, the user informs you of a new standard (e.g. "from now on, all modals must use Component X"), YOU MUST proactively propose to update the relevant markdown files in `docs/ai-collaboration/` so the rule is saved for future interactions and cross-machine developer usage.

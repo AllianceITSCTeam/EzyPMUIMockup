@@ -47,6 +47,24 @@ function CustomSelect({ value, options, onChange, renderOption, placeholder }: a
   );
 }
 
+function getBusinessDays(startDateStr: string, endDateStr: string): number {
+  if (!startDateStr || !endDateStr) return 0;
+  let start = new Date(startDateStr);
+  let end = new Date(endDateStr);
+  if (start > end) return 0;
+  
+  let count = 0;
+  let cur = new Date(start);
+  while (cur <= end) {
+    const day = cur.getDay();
+    if (day !== 0 && day !== 6) {
+      count++;
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+}
+
 export default function TaskDetails() {
   const router = useRouter();
   const params = useParams();
@@ -154,7 +172,8 @@ export default function TaskDetails() {
     assigneeId: task?.assigneeId || "",
     estimateHours: task?.estimateHours || 0,
     startDate: task?.startDate || "",
-    dueDate: task?.dueDate || ""
+    dueDate: task?.dueDate || "",
+    oneDeskId: task?.oneDeskId || ""
   });
   
   if (!task) {
@@ -243,10 +262,13 @@ export default function TaskDetails() {
       }
     }
 
+    if ((task.oneDeskId || "") !== editForm.oneDeskId) changes.push(`One Desk # to ${editForm.oneDeskId || "empty"}`);
+
     updateTask(task.id, {
       ...editForm,
       estimateHours: Number(editForm.estimateHours),
-      assigneeId: editForm.assigneeId || null
+      assigneeId: editForm.assigneeId || null,
+      oneDeskId: editForm.oneDeskId ? editForm.oneDeskId : undefined
     });
     addToast("success", "Task updated successfully");
     
@@ -296,7 +318,8 @@ export default function TaskDetails() {
                 assigneeId: task.assigneeId || "",
                 estimateHours: task.estimateHours,
                 startDate: task.startDate,
-                dueDate: task.dueDate
+                dueDate: task.dueDate,
+                oneDeskId: task.oneDeskId || ""
               });
               setIsEditModalOpen(true);
             }}
@@ -349,6 +372,11 @@ export default function TaskDetails() {
                 <span className={`text-[10px] ${getPriorityColor(task.priority)}`}>●</span>
                 {task.priority} Priority
               </div>
+              {task.oneDeskId && (
+                <div className="flex items-center gap-1.5 bg-surface shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] border border-transparent px-2.5 py-1 rounded text-sm text-text-primary font-medium">
+                  <span className="text-text-secondary">One Desk #:</span> {task.oneDeskId}
+                </div>
+              )}
             </div>
             
             <div className="prose prose-sm max-w-none text-text-secondary leading-relaxed">
@@ -615,6 +643,9 @@ export default function TaskDetails() {
             <div className="flex flex-col gap-2 w-full">
               <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">Timeline</span>
               <DateProgressBar startDate={task.startDate} dueDate={task.dueDate} showBothDates={true} />
+              <div className="mt-2 text-xs font-medium text-text-secondary bg-surface p-2 rounded border border-border-color">
+                Total Business Days: <span className="text-text-primary font-bold">{getBusinessDays(task.startDate, task.dueDate)}</span>
+              </div>
             </div>
           </Card>
 
@@ -776,6 +807,14 @@ export default function TaskDetails() {
                 className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary"
               />
             </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-text-primary">One Desk #</label>
+            <input 
+              type="text" value={editForm.oneDeskId} onChange={e => setEditForm({...editForm, oneDeskId: e.target.value})}
+              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary"
+            />
           </div>
 
           <div className="mt-4 flex justify-end gap-3 pt-4 border-t border-border-color">
