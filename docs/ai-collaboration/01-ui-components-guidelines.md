@@ -17,7 +17,7 @@ Khi đã có một component Button chuẩn, tất cả các nơi khác phải d
 
 ## 3. Tiêu chuẩn Inputs & Forms
 - Input field nên sử dụng nền hơi xám nhẹ (Ví dụ: `bg-slate-50`) khi chưa active, ranh giới rõ ràng nhưng không dựa vào border sắc nét.
-- **Dropdowns/Select:** **BẮT BUỘC** sử dụng component `CustomSelect` đã được dựng sẵn hoặc component tương đương của dự án. **Tùyệt đối không dùng thẻ `<select>` native của HTML** vì không áp dụng được style nhất quán.
+- **Dropdowns/Select:** **BẮT BUỘC** sử dụng component `CustomSelect` đã được dựng sẵn hoặc component tương đương của dự án. **Tuyệt đối không dùng thẻ `<select>` native của HTML** vì không áp dụng được style nhất quán. **Lưu ý quan trọng**: Vùng data sổ xuống (dropdown list) phải luôn hiển thị nổi lên trên cùng (ngay cả khi Select đặt trong một cấu trúc có `overflow: hidden` như Modal Card). Khuyến nghị dùng React Portal hoặc quản lý z-index tuyệt đối để tránh tình trạng component bị chìm hay cắt ngang.
 
 ## 4. Popup & Modals
 - Backdrop phải làm mờ (VD: `bg-black/30 backdrop-blur-sm`).

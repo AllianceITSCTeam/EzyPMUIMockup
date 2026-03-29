@@ -75,6 +75,7 @@ export default function TeamList() {
           Team (Admin Access)
         </h2>
         <button 
+          data-testid="btn-open-create-user-modal"
           onClick={() => setIsModalOpen(true)}
           className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors"
         >
@@ -308,7 +309,7 @@ export default function TeamList() {
 
       {/* MODAL */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New User">
-        <form onSubmit={handleCreate} className="flex flex-col gap-4">
+        <form data-testid="create-user-form" onSubmit={handleCreate} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Full Name <span className="text-danger">*</span></label>
             <input 
@@ -329,6 +330,7 @@ export default function TeamList() {
             <label className="text-sm font-medium text-text-primary">System Role</label>
             <CustomSelect 
               value={role} 
+              testId="user-role-select"
               onChange={(val: any) => setRole(val as UserRole)}
               options={[
                 { value: "Admin", label: "Admin" },
@@ -354,7 +356,7 @@ export default function TeamList() {
             <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+            <button type="submit" data-testid="btn-submit-user" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
               Add User
             </button>
           </div>

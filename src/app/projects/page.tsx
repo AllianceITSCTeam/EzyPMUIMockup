@@ -127,6 +127,7 @@ export default function ProjectsList() {
           Projects
         </h2>
         <button 
+          data-testid="btn-open-create-project-modal"
           onClick={() => setIsModalOpen(true)}
           className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors"
         >
@@ -276,11 +277,12 @@ export default function ProjectsList() {
 
       {/* MODAL */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Project" className="max-w-2xl">
-        <form onSubmit={handleCreate} className="flex flex-col gap-4">
+        <form data-testid="create-project-form" onSubmit={handleCreate} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Project Name <span className="text-danger">*</span></label>
             <input 
               type="text" required value={name} onChange={e => setName(e.target.value)}
+              data-testid="project-name-input"
               className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
               placeholder="E.g. Website Revamp 2026"
             />
@@ -298,6 +300,7 @@ export default function ProjectsList() {
               <label className="text-sm font-medium text-text-primary">Status</label>
               <CustomSelect 
                 value={status} 
+                testId="project-status-select"
                 onChange={(val: any) => setStatus(val as ProjectStatus)}
                 options={[
                   { value: "Active", label: "Active" },
@@ -526,7 +529,7 @@ export default function ProjectsList() {
             <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+            <button type="submit" data-testid="btn-submit-project" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
               Create Project
             </button>
           </div>

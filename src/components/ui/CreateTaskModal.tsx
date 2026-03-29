@@ -68,11 +68,12 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Create New Task">
-      <form onSubmit={handleCreateTask} className="flex flex-col gap-4">
+      <form data-testid="create-task-form" onSubmit={handleCreateTask} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-text-primary">Task Title <span className="text-danger">*</span></label>
           <input 
             type="text" required value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)}
+            data-testid="task-title-input"
             className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
             placeholder="e.g. Design Login Screen"
           />
@@ -90,6 +91,7 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
             <label className="text-sm font-medium text-text-primary">Project <span className="text-danger">*</span></label>
             <CustomSelect 
               value={newTaskProject} 
+              testId="task-project-select"
               onChange={(val: any) => setNewTaskProject(val)}
               options={[
                 { value: "", label: "Select project..." },
@@ -101,6 +103,7 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
             <label className="text-sm font-medium text-text-primary">Status <span className="text-danger">*</span></label>
             <CustomSelect 
               value={newTaskStatus} 
+              testId="task-status-select"
               onChange={(val: any) => setNewTaskStatus(val)}
               options={taskStatuses.map(s => ({ value: s.name, label: s.name }))}
             />
@@ -111,6 +114,7 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
             <label className="text-sm font-medium text-text-primary">Priority</label>
             <CustomSelect 
               value={newTaskPriority} 
+              testId="task-priority-select"
               onChange={(val: any) => setNewTaskPriority(val as TaskPriority)}
               options={taskPriorities.map(p => ({ value: p.name, label: p.name }))}
             />
@@ -153,6 +157,7 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
             <label className="text-sm font-medium text-text-primary">Assignee</label>
             <CustomSelect 
               value={newTaskAssignee} 
+              testId="task-assignee-select"
               onChange={(val: any) => setNewTaskAssignee(val)}
               options={[
                 { value: "", label: "Unassigned" },
@@ -166,7 +171,7 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
           <button type="button" onClick={onClose} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
             Cancel
           </button>
-          <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+          <button type="submit" data-testid="submit-create-task" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
             Create Task
           </button>
         </div>
