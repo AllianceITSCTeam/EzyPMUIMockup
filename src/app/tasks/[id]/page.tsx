@@ -372,11 +372,16 @@ export default function TaskDetails() {
                 <span className={`text-[10px] ${getPriorityColor(task.priority)}`}>●</span>
                 {task.priority} Priority
               </div>
-              {task.oneDeskId && (
+              {task.oneDeskId ? (
                 <div className="flex items-center gap-1.5 bg-surface shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] border border-transparent px-2.5 py-1 rounded text-sm text-text-primary font-medium">
                   <span className="text-text-secondary">One Desk #:</span> {task.oneDeskId}
                 </div>
+              ) : (
+                <div className="flex items-center gap-1.5 bg-surface shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] border border-transparent px-2.5 py-1 rounded text-sm text-text-primary font-medium opacity-60">
+                  <span className="text-text-secondary">One Desk #:</span> None
+                </div>
               )}
+
             </div>
             
             <div className="prose prose-sm max-w-none text-text-secondary leading-relaxed">
@@ -809,10 +814,11 @@ export default function TaskDetails() {
             </div>
           </div>
 
+
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">One Desk #</label>
             <input 
-              type="text" value={editForm.oneDeskId} onChange={e => setEditForm({...editForm, oneDeskId: e.target.value})}
+              type="text" value={editForm.oneDeskId || ""} onChange={e => setEditForm({...editForm, oneDeskId: e.target.value})}
               className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary"
             />
           </div>

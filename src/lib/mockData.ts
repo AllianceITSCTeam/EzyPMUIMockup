@@ -198,7 +198,7 @@ export const MOCK_PROJECTS: Project[] = [
 export const MOCK_TASKS: Task[] = [
   {
     id: "t1", projectId: "p4", title: "Initialize MortgageEzy DB", description: "Design initial PostgreSQL schema and run migrations",
-    status: "In Progress", priority: "High", assigneeId: "u1", estimateHours: 12, actualHours: 6, startDate: "2026-03-01", dueDate: "2026-03-10",
+    status: "In Progress", priority: "High", assigneeId: "u1", estimateHours: 12, actualHours: 6, startDate: "2026-03-01", dueDate: "2026-03-10", oneDeskId: "OD-12345"
   },
   {
     id: "t2", projectId: "p4", title: "Configure workflows", description: "Setup the activity context mappings",
