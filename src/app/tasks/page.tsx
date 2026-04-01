@@ -269,8 +269,8 @@ function TasksListContent() {
               <thead className="sticky top-0 z-10 bg-page-bg text-text-secondary text-xs uppercase shadow-sm">
                 <tr>
                   <th className="px-6 py-3 font-medium">Task Name</th>
-                  <th className="px-6 py-3 font-medium">Project</th>
                   <th className="px-6 py-3 font-medium">One Desk #</th>
+                  <th className="px-6 py-3 font-medium">Project</th>
                   <th className="px-6 py-3 font-medium">Assignee</th>
                   <th className="px-6 py-3 font-medium">Priority</th>
                   <th className="px-6 py-3 font-medium">Est / Act</th>
@@ -299,10 +299,10 @@ function TasksListContent() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-3 text-text-secondary">{project?.name}</td>
                       <td className="px-6 py-3 text-text-secondary font-medium">
                         {task.oneDeskId || <span className="opacity-50">—</span>}
                       </td>
+                      <td className="px-6 py-3 text-text-secondary">{project?.name}</td>
                       <td className="px-6 py-3">
                         {assignee ? (
                           <div className="flex items-center gap-2">

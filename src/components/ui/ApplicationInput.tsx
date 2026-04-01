@@ -8,16 +8,17 @@ interface ApplicationInputProps {
 }
 
 export function ApplicationInput({ applications, onChange }: ApplicationInputProps) {
-  const { projects } = useStore();
+  const { applicationItems } = useStore();
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Derive unique applications from all projects (if they exist)
-  const allApps = Array.from(new Set(projects.flatMap((p) => p.applications || []))).sort();
-  const availableApps = allApps.filter((a) => !applications.includes(a));
-  
-  const filteredSuggestions = availableApps.filter((a) => 
+  // Derive suggestions from the application catalog
+  const availableApps = applicationItems
+    .map(a => a.name)
+    .filter(name => !applications.includes(name));
+
+  const filteredSuggestions = availableApps.filter((a) =>
     a.toLowerCase().includes(inputValue.toLowerCase())
   );
 
@@ -37,7 +38,7 @@ export function ApplicationInput({ applications, onChange }: ApplicationInputPro
       onChange([...applications, trimmed]);
     }
     setInputValue("");
-    setShowSuggestions(false);
+    // Keep dropdown open so user can continue selecting
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

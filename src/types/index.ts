@@ -139,3 +139,9 @@ export interface Company {
   website?: string;
   logoUrl?: string;
 }
+
+export interface ApplicationItem {
+  id: string;
+  name: string;
+  description?: string;
+}

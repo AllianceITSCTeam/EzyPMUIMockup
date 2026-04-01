@@ -15,9 +15,10 @@ interface CustomSelectProps {
   placeholder?: string;
   className?: string;
   testId?: string;
+  closeOnSelect?: boolean;
 }
 
-export function CustomSelect({ value, options, onChange, placeholder = "Select...", className = "", testId }: CustomSelectProps) {
+export function CustomSelect({ value, options, onChange, placeholder = "Select...", className = "", testId = "", closeOnSelect = true }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
   const ref = useRef<HTMLDivElement>(null);
@@ -81,7 +82,9 @@ export function CustomSelect({ value, options, onChange, placeholder = "Select..
           onClick={(e) => {
             e.preventDefault();
             onChange(option.value);
-            setIsOpen(false);
+            if (closeOnSelect) {
+              setIsOpen(false);
+            }
           }}
           className="flex items-center justify-between w-full px-3 py-2 text-sm text-left hover:bg-page-bg transition-colors cursor-pointer"
         >

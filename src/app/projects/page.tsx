@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { StatusBadge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { MultiSelectWithSearch } from "@/components/ui/MultiSelectWithSearch";
 import { ApplicationInput } from "@/components/ui/ApplicationInput";
 import { useStore } from "@/store/useStore";
 import { THEME_COLORS } from "@/lib/mockData";
@@ -43,7 +44,9 @@ export default function ProjectsList() {
   
   const [oneDeskId, setOneDeskId] = useState("");
   const [specFiles, setSpecFiles] = useState<SpecFile[]>([]);
+  const specFileInputRef = useRef<HTMLInputElement>(null);
   const [companyIds, setCompanyIds] = useState<string[]>([]);
+  const [companySearchQuery, setCompanySearchQuery] = useState("");
   const [applications, setApplications] = useState<string[]>([]);
 
   const handleCreate = (e: React.FormEvent) => {
@@ -80,7 +83,7 @@ export default function ProjectsList() {
     // Reset and close
     setName(""); setDescription(""); setEstHours(""); setEndDate(""); setAvatarUrl("");
     setStatus("Active");
-    setOneDeskId(""); setSpecFiles([]); setCompanyIds([]); setApplications([]);
+    setOneDeskId(""); setSpecFiles([]); setCompanyIds([]); setCompanySearchQuery([]); setApplications([]);
     setStakeholders([]); setNewStakeholderId("");
     setThemeColor(THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]);
     setIsModalOpen(false);
@@ -278,14 +281,24 @@ export default function ProjectsList() {
       {/* MODAL */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Project" className="max-w-2xl">
         <form data-testid="create-project-form" onSubmit={handleCreate} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-text-primary">Project Name <span className="text-danger">*</span></label>
-            <input 
-              type="text" required value={name} onChange={e => setName(e.target.value)}
-              data-testid="project-name-input"
-              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
-              placeholder="E.g. Website Revamp 2026"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-text-primary">Project Name <span className="text-danger">*</span></label>
+              <input 
+                type="text" required value={name} onChange={e => setName(e.target.value)}
+                data-testid="project-name-input"
+                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
+                placeholder="E.g. Website Revamp 2026"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-text-primary">One Desk #</label>
+              <input 
+                type="text" value={oneDeskId} onChange={e => setOneDeskId(e.target.value)}
+                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary h-[38px]"
+                placeholder="E.g. OND-1234"
+              />
+            </div>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Description</label>
@@ -321,49 +334,29 @@ export default function ProjectsList() {
           </div>
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-text-primary">One Desk #</label>
-            <input 
-              type="text" value={oneDeskId} onChange={e => setOneDeskId(e.target.value)}
-              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary h-[38px]"
-              placeholder="E.g. OND-1234"
+            <label className="text-sm font-medium text-text-primary">Associated Companies</label>
+            <MultiSelectWithSearch
+              value={companySearchQuery}
+              selectedIds={companyIds}
+              onSearch={setCompanySearchQuery}
+              onSelect={(companyId) => {
+                if (!companyIds.includes(companyId)) {
+                  setCompanyIds([...companyIds, companyId]);
+                }
+              }}
+              onRemove={(companyId) => {
+                setCompanyIds(prev => prev.filter(id => id !== companyId));
+              }}
+              options={companies
+                .filter(c => c.name.toLowerCase().includes(companySearchQuery.toLowerCase()))
+                .map(c => ({ value: c.id, label: c.name }))}
+              placeholder="Search companies..."
+              getSelectedLabel={(id) => companies.find(c => c.id === id)?.name || id}
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-text-primary">Companies</label>
-            <div className="relative">
-              <CustomSelect 
-                value=""
-                onChange={(val: any) => {
-                  if (val && !companyIds.includes(val)) setCompanyIds([...companyIds, val]);
-                }}
-                options={[
-                  { value: "", label: "Select Company..." },
-                  ...companies.filter(c => !companyIds.includes(c.id)).map(c => ({ value: c.id, label: c.name }))
-                ]}
-              />
-            </div>
-          </div>
           
-          {companyIds.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-[-8px]">
-              {companyIds.map(id => {
-                const comp = companies.find(c => c.id === id);
-                if (!comp) return null;
-                return (
-                  <div key={id} className="flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-md text-[13px] font-medium border border-primary/20">
-                    <Building2 className="w-3.5 h-3.5" />
-                    {comp.name}
-                    <button type="button" onClick={() => setCompanyIds(prev => prev.filter(cId => cId !== id))} className="hover:text-danger ml-1">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
           <div className="flex flex-col gap-1.5 mt-2">
-            <label className="text-sm font-medium text-text-primary">Applications</label>
+            <label className="text-sm font-medium text-text-primary">Affected Applications</label>
             <ApplicationInput applications={applications} onChange={setApplications} />
           </div>
 
@@ -464,11 +457,12 @@ export default function ProjectsList() {
           </div>
 
           <div className="flex flex-col gap-1.5 mt-2">
-            <label className="text-sm font-medium text-text-primary flex items-center justify-between">
+            <div className="text-sm font-medium text-text-primary flex items-center justify-between">
               <span>Spec Files</span>
               <label className="cursor-pointer text-primary hover:text-primary/80 flex items-center gap-1 text-xs font-semibold">
                 <Paperclip className="w-3.5 h-3.5" /> Attach Files
                 <input 
+                  ref={specFileInputRef}
                   type="file" multiple className="hidden" 
                   onChange={(e) => {
                     if (e.target.files) {
@@ -478,7 +472,7 @@ export default function ProjectsList() {
                   }} 
                 />
               </label>
-            </label>
+            </div>
             {specFiles.length > 0 && (
               <div className="flex flex-col gap-2 mt-1">
                 {specFiles.map((file, idx) => (
@@ -500,7 +494,10 @@ export default function ProjectsList() {
               </div>
             )}
             {specFiles.length === 0 && (
-              <div className="border border-dashed border-border-color/30 rounded-lg p-6 flex flex-col items-center justify-center text-text-secondary bg-page-bg/30">
+              <div
+                role="button"
+                onClick={() => specFileInputRef.current?.click()}
+                className="border border-dashed border-border-color/30 rounded-lg p-6 flex flex-col items-center justify-center text-text-secondary bg-page-bg/30 cursor-pointer hover:bg-page-bg/60 hover:border-primary/30 transition-colors">
                 <Paperclip className="w-8 h-8 opacity-40 mb-2" />
                 <p className="text-sm text-text-primary font-medium">No files attached</p>
                 <p className="text-xs text-text-secondary">Click 'Attach Files' to upload specs</p>

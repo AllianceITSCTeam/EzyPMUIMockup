@@ -12,6 +12,7 @@ import { FileUploader } from "@/components/ui/FileUploader";
 import { CommentInput } from "@/components/ui/CommentInput";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { DateProgressBar } from "@/components/ui/DateProgressBar";
+import { DateInput } from "@/components/ui/DateInput";
 import { formatDate } from "@/lib/utils";
 import { ChevronRight, ArrowLeft, Pencil, Clock, Paperclip, Link as LinkIcon, Send, Clock3, ChevronDown, CheckCircle2 } from "lucide-react";
 import { TaskStatus, TaskPriority } from "@/types";
@@ -800,15 +801,15 @@ export default function TaskDetails() {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-primary">Start Date</label>
-              <input 
-                type="date" value={editForm.startDate} onChange={e => setEditForm({...editForm, startDate: e.target.value})}
+              <DateInput
+                value={editForm.startDate} onChange={v => setEditForm({...editForm, startDate: v})}
                 className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary"
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-primary">Due Date</label>
-              <input 
-                type="date" value={editForm.dueDate} onChange={e => setEditForm({...editForm, dueDate: e.target.value})}
+              <DateInput
+                value={editForm.dueDate} onChange={v => setEditForm({...editForm, dueDate: v})}
                 className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary"
               />
             </div>
@@ -934,15 +935,15 @@ export default function TaskDetails() {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-primary">Start Date *</label>
-              <input 
-                type="date" required value={subtaskForm.startDate} onChange={e => setSubtaskForm({...subtaskForm, startDate: e.target.value})}
+              <DateInput
+                required value={subtaskForm.startDate} onChange={v => setSubtaskForm({...subtaskForm, startDate: v})}
                 className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-primary">Due Date</label>
-              <input 
-                type="date" value={subtaskForm.dueDate} onChange={e => setSubtaskForm({...subtaskForm, dueDate: e.target.value})}
+              <DateInput
+                value={subtaskForm.dueDate} onChange={v => setSubtaskForm({...subtaskForm, dueDate: v})}
                 className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
               />
             </div>

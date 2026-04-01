@@ -4,20 +4,21 @@ import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
 import { useStore } from "@/store/useStore";
-import { Settings, Users, Shield, Plus, Edit, Trash2, Building2, Briefcase, Server, Gem, HelpCircle } from "lucide-react";
+import { Settings, Users, Shield, Plus, Edit, Trash2, Building2, Briefcase, Server, Gem, HelpCircle, AppWindow } from "lucide-react";
 
 export default function SettingsPage() {
   const { 
-    systemStakeholders, stakeholderRoles, taskStatuses, taskPriorities, companies,
+    systemStakeholders, stakeholderRoles, taskStatuses, taskPriorities, companies, applicationItems,
     addSystemStakeholder, updateSystemStakeholder, deleteSystemStakeholder,
     addStakeholderRole, updateStakeholderRole, deleteStakeholderRole,
     addTaskStatus, updateTaskStatusConfig, deleteTaskStatus,
     addTaskPriority, updateTaskPriority, deleteTaskPriority,
     addCompany, updateCompany, deleteCompany,
+    addApplicationItem, updateApplicationItem, deleteApplicationItem,
     addToast, logActivity
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState<"stakeholders" | "roles" | "task-statuses" | "task-priorities" | "companies">("stakeholders");
+  const [activeTab, setActiveTab] = useState<"stakeholders" | "roles" | "task-statuses" | "task-priorities" | "companies" | "applications">("stakeholders");
 
   // Multi-purpose Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -115,6 +116,13 @@ export default function SettingsPage() {
       } else {
         setGenericName(""); setCompAddress(""); setCompPhone(""); setCompEmail(""); setCompTaxCode(""); setCompWebsite("");
       }
+    } else if (activeTab === "applications") {
+      if (mode === "edit" && id) {
+        const target = applicationItems.find(a => a.id === id);
+        if (target) { setGenericName(target.name); setGenericDesc(target.description || ""); }
+      } else {
+        setGenericName(""); setGenericDesc("");
+      }
     }
     setIsModalOpen(true);
   };
@@ -176,6 +184,17 @@ export default function SettingsPage() {
         addToast("success", `Company ${genericName} updated`);
         logActivity(`Updated company configuration: ${genericName}`);
       }
+    } else if (activeTab === "applications") {
+      if (!genericName) return;
+      if (modalMode === "add") {
+        addApplicationItem({ id: `app-${Date.now()}`, name: genericName, description: genericDesc });
+        addToast("success", `Application ${genericName} created`);
+        logActivity(`Created application: ${genericName}`);
+      } else if (editingId) {
+        updateApplicationItem(editingId, { name: genericName, description: genericDesc });
+        addToast("success", `Application ${genericName} updated`);
+        logActivity(`Updated application: ${genericName}`);
+      }
     }
 
     setIsModalOpen(false);
@@ -203,6 +222,10 @@ export default function SettingsPage() {
       deleteCompany(id);
       addToast("info", `Company ${name} deleted`);
       logActivity(`Deleted company configuration: ${name}`);
+    } else if (activeTab === "applications") {
+      deleteApplicationItem(id);
+      addToast("info", `Application ${name} deleted`);
+      logActivity(`Deleted application: ${name}`);
     }
   };
 
@@ -218,7 +241,7 @@ export default function SettingsPage() {
           className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add {activeTab === "stakeholders" ? "Stakeholder" : activeTab === "roles" ? "Role" : activeTab === "task-statuses" ? "Status" : activeTab === "companies" ? "Company" : "Priority"}
+          Add {activeTab === "stakeholders" ? "Stakeholder" : activeTab === "roles" ? "Role" : activeTab === "task-statuses" ? "Status" : activeTab === "companies" ? "Company" : activeTab === "applications" ? "Application" : "Priority"}
         </button>
       </div>
 
@@ -268,6 +291,15 @@ export default function SettingsPage() {
           <Building2 className="w-4 h-4" />
           Companies Profile
         </button>
+        <button
+          onClick={() => setActiveTab("applications")}
+          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
+            activeTab === "applications" ? "border-primary text-primary" : "border-transparent text-text-secondary hover:text-text-primary"
+          }`}
+        >
+          <AppWindow className="w-4 h-4" />
+          Applications
+        </button>
       </div>
 
       <Card className="flex flex-col flex-1 overflow-hidden min-h-[400px]">
@@ -293,6 +325,12 @@ export default function SettingsPage() {
                   <th className="px-6 py-3 font-medium w-64">Company Name & Website</th>
                   <th className="px-6 py-3 font-medium">Contact</th>
                   <th className="px-6 py-3 font-medium">Tax Code</th>
+                  <th className="px-6 py-3 font-medium text-right w-24">Actions</th>
+                </tr>
+              ) : activeTab === "applications" ? (
+                <tr>
+                  <th className="px-6 py-3 font-medium w-1/3">Application Name</th>
+                  <th className="px-6 py-3 font-medium">Description</th>
                   <th className="px-6 py-3 font-medium text-right w-24">Actions</th>
                 </tr>
               ) : (
@@ -407,12 +445,27 @@ export default function SettingsPage() {
             {activeTab === "companies" && companies.length === 0 && (
               <tr><td colSpan={4} className="px-6 py-8 text-center text-text-secondary">No companies configured. Add a company profile to get started.</td></tr>
             )}
+            {activeTab === "applications" && applicationItems.map(app => (
+              <tr key={app.id} className="hover:bg-page-bg/50 transition-colors group">
+                <td className="px-6 py-4 font-medium">{app.name}</td>
+                <td className="px-6 py-4 text-text-secondary whitespace-normal">{app.description || "-"}</td>
+                <td className="px-6 py-4 text-right">
+                  <div className="flex justify-end gap-2">
+                    <button onClick={() => openModal("edit", app.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(app.id, app.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {activeTab === "applications" && applicationItems.length === 0 && (
+              <tr><td colSpan={3} className="px-6 py-8 text-center text-text-secondary">No applications configured.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
     </Card>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalMode === "add" ? `Add to Catalog` : `Edit Catalog Item`}>
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={modalMode === "add" ? `Add to Catalog` : `Edit Catalog Item`}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {activeTab === "stakeholders" ? (
             <>

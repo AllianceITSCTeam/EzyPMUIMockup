@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { DateInput } from "@/components/ui/DateInput";
 import { useStore } from "@/store/useStore";
 import { Task, TaskStatus, TaskPriority } from "@/types";
 
@@ -131,15 +132,15 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Start Date *</label>
-            <input 
-              type="date" required value={newTaskStartDate} onChange={e => setNewTaskStartDate(e.target.value)}
+            <DateInput
+              required value={newTaskStartDate} onChange={setNewTaskStartDate}
               className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
             />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Due Date</label>
-            <input 
-              type="date" value={newTaskDueDate} onChange={e => setNewTaskDueDate(e.target.value)}
+            <DateInput
+              value={newTaskDueDate} onChange={setNewTaskDueDate}
               className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
             />
           </div>
