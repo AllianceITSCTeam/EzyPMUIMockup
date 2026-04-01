@@ -14,7 +14,7 @@ import { ApplicationInput } from "@/components/ui/ApplicationInput";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { SkillTag } from "@/components/ui/SkillTag";
-import { formatDate } from "@/lib/utils";
+import { formatDate, calcBusinessDays } from "@/lib/utils";
 import { CreateTaskModal } from "@/components/ui/CreateTaskModal";
 import { ChevronRight, ArrowLeft, Pencil, Users, LayoutList, Share2, Plus, FileText, X, Search, Trash2, Building2, Landmark, Crown, Store, Headset, Handshake, Info, CheckCircle2, BarChart2, ChevronDown, PanelLeftClose, PanelLeftOpen, Paperclip } from "lucide-react";
 
@@ -48,6 +48,20 @@ export default function ProjectDetails() {
   const project = projects.find(p => p.id === projectId);
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [taskEditForm, setTaskEditForm] = useState({
+    title: "",
+    description: "",
+    status: "To Do",
+    priority: "Medium",
+    assigneeId: "",
+    estimateHours: 0,
+    dueDate: "",
+    oneDeskId: ""
+  });
 
   useEffect(() => {
     if (project) {
@@ -61,8 +75,25 @@ export default function ProjectDetails() {
     }
   }, [project?.id]);
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  // Populate task edit form when editing task changes
+  useEffect(() => {
+    if (editingTaskId) {
+      const task = tasks.find(t => t.id === editingTaskId);
+      if (task) {
+        setTaskEditForm({
+          title: task.title,
+          description: task.description || "",
+          status: task.status,
+          priority: task.priority,
+          assigneeId: task.assigneeId,
+          estimateHours: task.estimateHours,
+          dueDate: task.dueDate,
+          oneDeskId: task.oneDeskId || ""
+        });
+      }
+    }
+  }, [editingTaskId]);
+
   const [ganttExpandedTasks, setGanttExpandedTasks] = useState<Set<string>>(new Set());
 
 
@@ -320,6 +351,15 @@ export default function ProjectDetails() {
                 <span className="text-xs text-text-secondary font-medium uppercase tracking-widest">End Date</span>
                 <span className="font-semibold text-text-primary">{formatDate(project.endDate) || "N/A"}</span>
               </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-text-secondary font-medium uppercase tracking-widest">Total Business Days</span>
+                <span className="font-semibold text-text-primary">
+                  {(() => {
+                    const days = calcBusinessDays(project.startDate, project.endDate);
+                    return days !== null ? `${days} days` : "N/A";
+                  })()}
+                </span>
+              </div>
             </div>
           </Card>
 
@@ -493,9 +533,9 @@ export default function ProjectDetails() {
                     <tr className="bg-page-bg/50 text-text-secondary text-xs uppercase">
                       <th className="px-6 py-3 font-medium">Task Name</th>
                       <th className="px-6 py-3 font-medium">One Desk #</th>
+                      <th className="px-6 py-3 font-medium">Resource</th>
                       <th className="px-6 py-3 font-medium">Status</th>
                       <th className="px-6 py-3 font-medium">Priority</th>
-                      <th className="px-6 py-3 font-medium">Resource</th>
                       <th className="px-6 py-3 font-medium">Est / Act</th>
                       <th className="px-6 py-3 font-medium min-w-[200px]">Start - Due Date</th>
                     </tr>
@@ -509,8 +549,6 @@ export default function ProjectDetails() {
                         <td className="px-6 py-4 text-text-secondary font-medium">
                           {task.oneDeskId || <span className="opacity-50">—</span>}
                         </td>
-                        <td className="px-6 py-4"><StatusBadge status={task.status} /></td>
-                        <td className="px-6 py-4 text-text-secondary">{task.priority}</td>
                         <td className="px-6 py-4">
                           {assignee ? (
                             <div className="flex items-center gap-2">
@@ -521,6 +559,8 @@ export default function ProjectDetails() {
                             <span className="text-text-secondary text-sm italic">—</span>
                           )}
                         </td>
+                        <td className="px-6 py-4"><StatusBadge status={task.status} /></td>
+                        <td className="px-6 py-4 text-text-secondary">{task.priority}</td>
                         <td className="px-6 py-4 text-text-secondary">
                           <span className="font-medium text-text-primary">{task.estimateHours}h</span> / {task.actualHours}h
                         </td>
@@ -580,7 +620,7 @@ export default function ProjectDetails() {
             
             const ganttStart = new Date(minD);
             const days = Math.max(1, Math.ceil((maxD - minD) / (24 * 60 * 60 * 1000)));
-            const dayWidth = 28;
+            const dayWidth = 22;
 
             return (
               <div className="flex flex-col h-full bg-surface">
@@ -613,13 +653,13 @@ export default function ProjectDetails() {
                 </div>
                 <div className="flex flex-1 overflow-auto relative min-h-[400px]">
                   {/* Left Sidebar Table */}
-                  <div className="w-[480px] shrink-0 border-r border-border-color bg-surface sticky left-0 z-20 flex flex-col shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
+                  <div className="w-[520px] shrink-0 border-r border-border-color bg-surface sticky left-0 z-20 flex flex-col shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
                     <div className="h-10 shrink-0 border-b border-border-color flex items-center px-4 font-bold text-[11px] text-text-secondary bg-page-bg uppercase tracking-wider relative">
                       <div className="w-[230px] shrink-0">Task Name</div>
                       <div className="w-[90px] shrink-0">Status</div>
                       <div className="w-[60px] shrink-0">Start</div>
                       <div className="w-[60px] shrink-0">End</div>
-                      <div className="w-[40px] shrink-0 text-right">Act</div>
+                      <div className="w-[40px] shrink-0 text-center">Edit</div>
                     </div>
                     <div className="flex flex-col flex-1 pb-10">
                       {flatTasks.map(t => (
@@ -657,9 +697,12 @@ export default function ProjectDetails() {
                           <div className="w-[60px] shrink-0 text-[11px] text-text-secondary truncate">
                             {t.dueDate ? new Date(t.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "N/A"}
                           </div>
-                          <div className="w-[30px] shrink-0 flex justify-end">
+                          <div className="w-[40px] shrink-0 flex justify-end">
                             <button 
-                              onClick={() => router.push(`/tasks/${t.id}`)}
+                              onClick={() => {
+                                setEditingTaskId(t.id);
+                                setIsEditTaskModalOpen(true);
+                              }}
                               className="text-text-secondary hover:text-primary p-1 rounded hover:bg-primary/10 transition-colors"
                               title="Edit Task"
                             >
@@ -1297,6 +1340,145 @@ export default function ProjectDetails() {
         onClose={() => setIsCreateTaskOpen(false)} 
         defaultProjectId={project.id} 
       />
+
+      {/* EDIT TASK MODAL */}
+      {editingTaskId && (
+        <Modal 
+          isOpen={isEditTaskModalOpen} 
+          onClose={() => {
+            setIsEditTaskModalOpen(false);
+            setEditingTaskId(null);
+          }} 
+          title={`Edit Task: ${taskEditForm.title}`}
+          className="max-w-2xl"
+        >
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            const { updateTask } = useStore.getState();
+            updateTask(editingTaskId, {
+              ...tasks.find(t => t.id === editingTaskId),
+              ...taskEditForm
+            });
+            addToast("success", `Task "${taskEditForm.title}" updated`);
+            logActivity(`Updated task: ${taskEditForm.title}`);
+            setIsEditTaskModalOpen(false);
+            setEditingTaskId(null);
+          }} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-text-primary">Task Title *</label>
+              <input 
+                type="text" required value={taskEditForm.title} 
+                onChange={e => setTaskEditForm({...taskEditForm, title: e.target.value})}
+                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm text-text-primary"
+                placeholder="Task title"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-text-primary">Description</label>
+              <textarea 
+                rows={3} value={taskEditForm.description} 
+                onChange={e => setTaskEditForm({...taskEditForm, description: e.target.value})}
+                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm text-text-primary resize-none"
+                placeholder="Task description"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">Status</label>
+                <CustomSelect 
+                  value={taskEditForm.status}
+                  onChange={(val: any) => setTaskEditForm({...taskEditForm, status: val})}
+                  options={[
+                    { value: "To Do", label: "To Do" },
+                    { value: "In Progress", label: "In Progress" },
+                    { value: "Pending", label: "Pending" },
+                    { value: "On Hold", label: "On Hold" },
+                    { value: "No Specs", label: "No Specs" },
+                    { value: "Completed", label: "Completed" },
+                    { value: "Closed", label: "Closed" }
+                  ]}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">Priority</label>
+                <CustomSelect 
+                  value={taskEditForm.priority}
+                  onChange={(val: any) => setTaskEditForm({...taskEditForm, priority: val})}
+                  options={[
+                    { value: "Critical", label: "Critical" },
+                    { value: "High", label: "High" },
+                    { value: "Medium", label: "Medium" },
+                    { value: "Low", label: "Low" }
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">Assignee</label>
+                <CustomSelect 
+                  value={taskEditForm.assigneeId}
+                  onChange={(val: any) => setTaskEditForm({...taskEditForm, assigneeId: val})}
+                  options={[
+                    { value: "", label: "Unassigned" },
+                    ...users.map(u => ({ value: u.id, label: u.name }))
+                  ]}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">Estimate (Hours)</label>
+                <input 
+                  type="number" min="0" value={taskEditForm.estimateHours}
+                  onChange={e => setTaskEditForm({...taskEditForm, estimateHours: Number(e.target.value)})}
+                  className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm text-text-primary"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">Due Date</label>
+                <input 
+                  type="date" value={taskEditForm.dueDate}
+                  onChange={e => setTaskEditForm({...taskEditForm, dueDate: e.target.value})}
+                  className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm text-text-primary"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">One Desk #</label>
+                <input 
+                  type="text" value={taskEditForm.oneDeskId}
+                  onChange={e => setTaskEditForm({...taskEditForm, oneDeskId: e.target.value})}
+                  className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm text-text-primary"
+                  placeholder="E.g. OND-1234"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-border-color">
+              <button 
+                type="button" 
+                onClick={() => {
+                  setIsEditTaskModalOpen(false);
+                  setEditingTaskId(null);
+                }}
+                className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors shadow-sm"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 }

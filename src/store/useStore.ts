@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Task, Project, User, ActivityLog, TaskStatus, Comment, Stakeholder, StakeholderRole, TaskStatusConfig, TaskPriorityConfig, Company } from "../types";
-import { MOCK_TASKS, MOCK_PROJECTS, MOCK_USERS, MOCK_ACTIVITIES, MOCK_COMMENTS, MOCK_SYSTEM_STAKEHOLDERS, MOCK_STAKEHOLDER_ROLES, MOCK_TASK_STATUSES, MOCK_TASK_PRIORITIES, MOCK_COMPANIES } from "../lib/mockData";
+import { Task, Project, User, ActivityLog, TaskStatus, Comment, Stakeholder, StakeholderRole, TaskStatusConfig, TaskPriorityConfig, Company, ApplicationItem } from "../types";
+import { MOCK_TASKS, MOCK_PROJECTS, MOCK_USERS, MOCK_ACTIVITIES, MOCK_COMMENTS, MOCK_SYSTEM_STAKEHOLDERS, MOCK_STAKEHOLDER_ROLES, MOCK_TASK_STATUSES, MOCK_TASK_PRIORITIES, MOCK_COMPANIES, MOCK_APPLICATIONS } from "../lib/mockData";
 
 export type ToastType = "success" | "error" | "info" | "warning";
 export interface Toast {
@@ -69,6 +69,10 @@ interface AppState {
   addCompany: (comp: Company) => void;
   updateCompany: (id: string, updates: Partial<Company>) => void;
   deleteCompany: (id: string) => void;
+  applicationItems: ApplicationItem[];
+  addApplicationItem: (app: ApplicationItem) => void;
+  updateApplicationItem: (id: string, updates: Partial<ApplicationItem>) => void;
+  deleteApplicationItem: (id: string) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -84,6 +88,7 @@ export const useStore = create<AppState>()(
       taskStatuses: MOCK_TASK_STATUSES,
       taskPriorities: MOCK_TASK_PRIORITIES,
       companies: MOCK_COMPANIES,
+      applicationItems: MOCK_APPLICATIONS,
       toasts: [],
       isLoading: true, // Start loading
       currentUser: null, // Will be hydrated from localStorage or fallback
@@ -250,6 +255,18 @@ export const useStore = create<AppState>()(
 
       deleteCompany: (id) => set((state) => ({
         companies: state.companies.filter(c => c.id !== id)
+      })),
+
+      addApplicationItem: (app) => set((state) => ({
+        applicationItems: [...state.applicationItems, app]
+      })),
+
+      updateApplicationItem: (id, updates) => set((state) => ({
+        applicationItems: state.applicationItems.map(a => a.id === id ? { ...a, ...updates } : a)
+      })),
+
+      deleteApplicationItem: (id) => set((state) => ({
+        applicationItems: state.applicationItems.filter(a => a.id !== id)
       })),
 
       addUser: (user) => set((state) => ({

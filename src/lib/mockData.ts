@@ -1,9 +1,19 @@
-import { User, Project, Task, ActivityLog, Comment, Stakeholder, StakeholderRole, TaskStatusConfig, TaskPriorityConfig, Company } from "../types";
+import { User, Project, Task, ActivityLog, Comment, Stakeholder, StakeholderRole, TaskStatusConfig, TaskPriorityConfig, Company, ApplicationItem } from "../types";
 
 export const THEME_COLORS = [
   "#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6",
   "#ec4899", "#14b8a6", "#f97316", "#6366f1", "#84cc16",
   "#06b6d4", "#d946ef", "#eab308", "#22c55e", "#a855f7"
+];
+
+export const MOCK_APPLICATIONS: ApplicationItem[] = [
+  { id: "app-1", name: "So Ezy" },
+  { id: "app-2", name: "Source Ezy" },
+  { id: "app-3", name: "DEB Ezy" },
+  { id: "app-4", name: "DEB SMSF" },
+  { id: "app-5", name: "DEB Prime" },
+  { id: "app-6", name: "TraceNTrace" },
+  { id: "app-7", name: "Online Calculator" },
 ];
 
 export const MOCK_COMPANIES: Company[] = [
