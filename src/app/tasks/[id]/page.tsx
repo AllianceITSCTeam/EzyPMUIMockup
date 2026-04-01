@@ -87,7 +87,7 @@ export default function TaskDetails() {
 
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [logHoursInput, setLogHoursInput] = useState("");
-  const [logDate, setLogDate] = useState(new Date().toISOString().split("T")[0]);
+  const [logDate, setLogDate] = useState("");
   const [logComment, setLogComment] = useState("");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
 
@@ -108,8 +108,8 @@ export default function TaskDetails() {
     priority: "Medium",
     assigneeId: "",
     estimateHours: 0,
-    startDate: new Date().toISOString().split("T")[0],
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+    startDate: "",
+    dueDate: ""
   });
 
   const handleAddChecklist = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -658,7 +658,7 @@ export default function TaskDetails() {
           <Card className="p-5 flex flex-col gap-4 bg-primary/5">
             <div className="flex justify-between items-center mb-1">
               <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Time Tracking</h3>
-              <button onClick={() => setIsLogModalOpen(true)} className="flex items-center gap-1.5 text-xs font-bold bg-primary text-surface px-2.5 py-1.5 rounded hover:bg-primary/90 transition-colors">
+              <button onClick={() => { setLogDate(new Date().toISOString().split("T")[0]); setIsLogModalOpen(true); }} className="flex items-center gap-1.5 text-xs font-bold bg-primary text-surface px-2.5 py-1.5 rounded hover:bg-primary/90 transition-colors">
                 <Clock className="w-3.5 h-3.5" /> Log Hours
               </button>
             </div>

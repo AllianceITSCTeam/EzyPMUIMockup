@@ -85,7 +85,7 @@ export default function ProjectDetails() {
           description: task.description || "",
           status: task.status,
           priority: task.priority,
-          assigneeId: task.assigneeId,
+          assigneeId: task.assigneeId ?? "",
           estimateHours: task.estimateHours,
           dueDate: task.dueDate,
           oneDeskId: task.oneDeskId || ""

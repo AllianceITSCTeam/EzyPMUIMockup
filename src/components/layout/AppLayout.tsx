@@ -45,8 +45,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <p className="font-medium text-sm">Loading workspace...</p>
               </div>
             </div>
-          ) : null}
-          {children}
+          ) : children}
         </main>
       </div>
     </div>
