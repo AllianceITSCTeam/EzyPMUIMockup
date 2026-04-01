@@ -1,6 +1,6 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@/lib/themeContext";
 import { ToastContainer } from "./ui/Toast";
 import AppLayout from "./layout/AppLayout";
 
@@ -10,7 +10,7 @@ export function ClientProvider({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider>
       <ToastContainer />
       <AppLayout>{children}</AppLayout>
     </ThemeProvider>

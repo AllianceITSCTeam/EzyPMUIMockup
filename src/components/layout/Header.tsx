@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Bell, Search as SearchIcon, LogOut, User as UserIcon, Settings, Moon, Sun, FolderKanban, CheckSquare, LayoutDashboard, ListTodo, Users as UsersIcon, BarChart2, Activity } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/lib/themeContext";
 import Link from "next/link";
 import { useStore } from "@/store/useStore";
 import { getActionContext } from "@/lib/activityContext";

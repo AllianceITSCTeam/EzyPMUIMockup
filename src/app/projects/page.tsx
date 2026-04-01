@@ -23,6 +23,8 @@ export default function ProjectsList() {
 
   useEffect(() => {
     setIsMounted(true);
+    setStartDate(new Date().toISOString().split("T")[0]);
+    setThemeColor(THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]);
   }, []);
 
   // Form State
@@ -31,9 +33,9 @@ export default function ProjectsList() {
   const [status, setStatus] = useState<ProjectStatus>("Active");
   const [estSource, setEstSource] = useState<EstimateSource>("TASK");
   const [estHours, setEstHours] = useState("");
-  const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
+  const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [themeColor, setThemeColor] = useState(THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]);
+  const [themeColor, setThemeColor] = useState(THEME_COLORS[0]);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [stakeholders, setStakeholders] = useState<{id: string, name: string, role: string, isCustom: boolean}[]>([]);
   const [newStakeholderId, setNewStakeholderId] = useState("");
@@ -83,7 +85,7 @@ export default function ProjectsList() {
     // Reset and close
     setName(""); setDescription(""); setEstHours(""); setEndDate(""); setAvatarUrl("");
     setStatus("Active");
-    setOneDeskId(""); setSpecFiles([]); setCompanyIds([]); setCompanySearchQuery([]); setApplications([]);
+    setOneDeskId(""); setSpecFiles([]); setCompanyIds([]); setCompanySearchQuery(""); setApplications([]);
     setStakeholders([]); setNewStakeholderId("");
     setThemeColor(THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]);
     setIsModalOpen(false);

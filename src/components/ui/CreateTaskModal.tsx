@@ -22,7 +22,7 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
   const [newTaskAssignee, setNewTaskAssignee] = useState("");
   const [newTaskProject, setNewTaskProject] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState<TaskStatus>("To Do");
-  const [newTaskStartDate, setNewTaskStartDate] = useState(new Date().toISOString().split("T")[0]);
+  const [newTaskStartDate, setNewTaskStartDate] = useState("");
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
   const [newTaskOneDeskId, setNewTaskOneDeskId] = useState("");
 
