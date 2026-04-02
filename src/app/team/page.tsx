@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -77,7 +77,7 @@ export default function TeamList() {
         <button 
           data-testid="btn-open-create-user-modal"
           onClick={() => setIsModalOpen(true)}
-          className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors"
+          className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Create User
@@ -127,23 +127,23 @@ export default function TeamList() {
             <span className="text-xs font-semibold text-text-secondary uppercase mr-2 shrink-0">Quick Filters:</span>
             <button 
               onClick={() => setStatusFilter("All")}
-              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${statusFilter === "All" ? "bg-primary-light text-primary" : "text-text-secondary hover:bg-page-bg"}`}
+              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors cursor-pointer ${statusFilter === "All" ? "bg-primary-light text-primary" : "text-text-secondary hover:bg-page-bg"}`}
             >All</button>
             <button 
               onClick={() => setStatusFilter("Available")}
-              className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 transition-colors ${statusFilter === "Available" ? "bg-success/20 text-success" : "text-text-secondary hover:bg-success/10 hover:text-success"}`}
+              className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 transition-colors cursor-pointer ${statusFilter === "Available" ? "bg-success/20 text-success" : "text-text-secondary hover:bg-success/10 hover:text-success"}`}
             >
               <span className="w-2 h-2 rounded-full bg-success"></span> Available
             </button>
             <button 
               onClick={() => setStatusFilter("Busy")}
-              className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 transition-colors ${statusFilter === "Busy" ? "bg-warning/30 text-warning" : "text-text-secondary hover:bg-warning/20 hover:text-warning"}`}
+              className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 transition-colors cursor-pointer ${statusFilter === "Busy" ? "bg-warning/30 text-warning" : "text-text-secondary hover:bg-warning/20 hover:text-warning"}`}
             >
               <span className="w-2 h-2 rounded-full bg-warning"></span> Busy
             </button>
             <button 
               onClick={() => setStatusFilter("Overloaded")}
-              className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 transition-colors ${statusFilter === "Overloaded" ? "bg-danger/20 text-danger" : "text-text-secondary hover:bg-danger/10 hover:text-danger"}`}
+              className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 transition-colors cursor-pointer ${statusFilter === "Overloaded" ? "bg-danger/20 text-danger" : "text-text-secondary hover:bg-danger/10 hover:text-danger"}`}
             >
               <span className="w-2 h-2 rounded-full bg-danger"></span> Overloaded
             </button>
@@ -152,7 +152,7 @@ export default function TeamList() {
           <div className="flex items-center bg-page-bg rounded-md p-1 shrink-0 ml-4 hidden sm:flex">
             <button 
               onClick={() => setViewMode("table")}
-              className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                 viewMode === "table" ? "bg-surface shadow-[0_1px_3px_rgb(0,0,0,0.02)] text-primary" : "text-text-secondary hover:text-text-primary"
               }`}
             >
@@ -160,7 +160,7 @@ export default function TeamList() {
             </button>
             <button 
               onClick={() => setViewMode("card")}
-              className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                 viewMode === "card" ? "bg-surface shadow-[0_1px_3px_rgb(0,0,0,0.02)] text-primary" : "text-text-secondary hover:text-text-primary"
               }`}
             >
@@ -353,10 +353,10 @@ export default function TeamList() {
           </div>
           
           <div className="mt-6 flex justify-end gap-3">
-            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
+            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer">
               Cancel
             </button>
-            <button type="submit" data-testid="btn-submit-user" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+            <button type="submit" data-testid="btn-submit-user" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors cursor-pointer">
               Add User
             </button>
           </div>

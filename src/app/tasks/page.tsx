@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -173,7 +173,7 @@ function TasksListContent() {
         </h2>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors"
+          className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Create Task
@@ -402,7 +402,7 @@ function TasksListContent() {
                       </Droppable>
                       
                       <div className="p-1 mt-2">
-                        <button className="w-full py-2 flex items-center justify-center gap-2 text-text-secondary hover:text-primary hover:bg-surface rounded-lg transition-colors text-sm font-medium shadow-[0_1px_2px_rgb(0,0,0,0.02)]">
+                        <button className="w-full py-2 flex items-center justify-center gap-2 text-text-secondary hover:text-primary hover:bg-surface rounded-lg transition-colors text-sm font-medium shadow-[0_1px_2px_rgb(0,0,0,0.02)] cursor-pointer">
                           <Plus className="w-4 h-4" /> Add Task
                         </button>
                       </div>

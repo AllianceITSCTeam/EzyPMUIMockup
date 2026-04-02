@@ -122,7 +122,7 @@ export function MultiSelectWithSearch({
   return (
     <div ref={ref} className={`relative ${className}`}>
       <div
-        onClick={() => setIsOpen(true)}
+        onClick={() => { updateCoords(); setIsOpen(true); }}
         className="flex items-center flex-wrap gap-1.5 px-3 py-2 rounded-lg text-sm transition-all text-text-primary bg-surface shadow-sm hover:shadow-md cursor-text outline-none w-full focus-within:ring-2 focus-within:ring-primary/20 hover:bg-surface/80 min-h-[38px]"
       >
         {selectedIds.length > 0 && (
@@ -152,7 +152,7 @@ export function MultiSelectWithSearch({
           type="text"
           value={value}
           onChange={(e) => onSearch(e.target.value)}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => { updateCoords(); setIsOpen(true); }}
           placeholder={selectedIds.length === 0 ? placeholder : "Add more..."}
           className="flex-1 bg-transparent outline-none text-text-primary placeholder:text-text-secondary min-w-[100px]"
         />

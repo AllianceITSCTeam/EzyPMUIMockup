@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Card } from "@/components/ui/Card";
@@ -238,7 +238,7 @@ export default function SettingsPage() {
         </h2>
         <button 
           onClick={() => openModal("add")}
-          className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors"
+          className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Add {activeTab === "stakeholders" ? "Stakeholder" : activeTab === "roles" ? "Role" : activeTab === "task-statuses" ? "Status" : activeTab === "companies" ? "Company" : activeTab === "applications" ? "Application" : "Priority"}
@@ -248,7 +248,7 @@ export default function SettingsPage() {
       <div className="flex gap-1 pb-0 mb-2">
         <button
           onClick={() => setActiveTab("stakeholders")}
-          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
+          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
             activeTab === "stakeholders" ? "border-primary text-primary" : "border-transparent text-text-secondary hover:text-text-primary"
           }`}
         >
@@ -257,7 +257,7 @@ export default function SettingsPage() {
         </button>
         <button
           onClick={() => setActiveTab("roles")}
-          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
+          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
             activeTab === "roles" ? "border-primary text-primary" : "border-transparent text-text-secondary hover:text-text-primary"
           }`}
         >
@@ -266,7 +266,7 @@ export default function SettingsPage() {
         </button>
         <button
           onClick={() => setActiveTab("task-statuses")}
-          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
+          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
             activeTab === "task-statuses" ? "border-primary text-primary" : "border-transparent text-text-secondary hover:text-text-primary"
           }`}
         >
@@ -275,7 +275,7 @@ export default function SettingsPage() {
         </button>
         <button
           onClick={() => setActiveTab("task-priorities")}
-          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
+          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
             activeTab === "task-priorities" ? "border-primary text-primary" : "border-transparent text-text-secondary hover:text-text-primary"
           }`}
         >
@@ -284,7 +284,7 @@ export default function SettingsPage() {
         </button>
         <button
           onClick={() => setActiveTab("companies")}
-          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
+          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
             activeTab === "companies" ? "border-primary text-primary" : "border-transparent text-text-secondary hover:text-text-primary"
           }`}
         >
@@ -293,7 +293,7 @@ export default function SettingsPage() {
         </button>
         <button
           onClick={() => setActiveTab("applications")}
-          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
+          className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
             activeTab === "applications" ? "border-primary text-primary" : "border-transparent text-text-secondary hover:text-text-primary"
           }`}
         >
@@ -351,10 +351,10 @@ export default function SettingsPage() {
                 <td className="px-6 py-4">{sh.phone || "-"}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => openModal("edit", sh.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color">
+                    <button onClick={() => openModal("edit", sh.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer">
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(sh.id, sh.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color">
+                    <button onClick={() => handleDelete(sh.id, sh.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -370,10 +370,10 @@ export default function SettingsPage() {
                 <td className="px-6 py-4 text-text-secondary whitespace-normal min-w-[300px]">{role.description || "-"}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => openModal("edit", role.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color">
+                    <button onClick={() => openModal("edit", role.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer">
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(role.id, role.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color">
+                    <button onClick={() => handleDelete(role.id, role.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -389,8 +389,8 @@ export default function SettingsPage() {
                 <td className="px-6 py-4 text-text-secondary whitespace-normal">{status.description || "-"}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => openModal("edit", status.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => handleDelete(status.id, status.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => openModal("edit", status.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(status.id, status.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -404,8 +404,8 @@ export default function SettingsPage() {
                 <td className="px-6 py-4 text-text-secondary whitespace-normal">{priority.description || "-"}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => openModal("edit", priority.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => handleDelete(priority.id, priority.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => openModal("edit", priority.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(priority.id, priority.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -423,8 +423,8 @@ export default function SettingsPage() {
                 <td className="px-6 py-4 text-text-secondary">{comp.taxCode || "-"}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => openModal("edit", comp.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => handleDelete(comp.id, comp.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => openModal("edit", comp.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(comp.id, comp.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -451,8 +451,8 @@ export default function SettingsPage() {
                 <td className="px-6 py-4 text-text-secondary whitespace-normal">{app.description || "-"}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-2">
-                    <button onClick={() => openModal("edit", app.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => handleDelete(app.id, app.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => openModal("edit", app.id)} className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(app.id, app.name)} className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-surface hover:bg-page-bg rounded-md shadow-sm border border-border-color cursor-pointer"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -569,10 +569,10 @@ export default function SettingsPage() {
           )}
 
           <div className="mt-6 flex justify-end gap-3">
-            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
+            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors cursor-pointer">
               {modalMode === "add" ? "Create" : "Save Changes"}
             </button>
           </div>

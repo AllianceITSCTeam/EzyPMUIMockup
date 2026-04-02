@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/Card";
@@ -8,7 +8,7 @@ import { Modal } from "@/components/ui/Modal";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { MultiSelectWithSearch } from "@/components/ui/MultiSelectWithSearch";
-import { ApplicationInput } from "@/components/ui/ApplicationInput";
+import { DateInput } from "@/components/ui/DateInput";
 import { useStore } from "@/store/useStore";
 import { THEME_COLORS } from "@/lib/mockData";
 import Link from "next/link";
@@ -17,7 +17,7 @@ import { Search, Filter, Calendar as CalendarIcon, PieChart, Users, Plus, Layout
 import { EstimateSource, Project, ProjectStatus, SpecFile } from "@/types";
 
 export default function ProjectsList() {
-  const { projects, tasks, users, companies, addProject, logActivity, addToast } = useStore();
+  const { projects, tasks, users, companies, applicationItems, addProject, logActivity, addToast } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -50,6 +50,7 @@ export default function ProjectsList() {
   const [companyIds, setCompanyIds] = useState<string[]>([]);
   const [companySearchQuery, setCompanySearchQuery] = useState("");
   const [applications, setApplications] = useState<string[]>([]);
+  const [appSearchQuery, setAppSearchQuery] = useState("");
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +86,7 @@ export default function ProjectsList() {
     // Reset and close
     setName(""); setDescription(""); setEstHours(""); setEndDate(""); setAvatarUrl("");
     setStatus("Active");
-    setOneDeskId(""); setSpecFiles([]); setCompanyIds([]); setCompanySearchQuery(""); setApplications([]);
+    setOneDeskId(""); setSpecFiles([]); setCompanyIds([]); setCompanySearchQuery(""); setApplications([]); setAppSearchQuery("");
     setStakeholders([]); setNewStakeholderId("");
     setThemeColor(THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]);
     setIsModalOpen(false);
@@ -134,7 +135,7 @@ export default function ProjectsList() {
         <button 
           data-testid="btn-open-create-project-modal"
           onClick={() => setIsModalOpen(true)}
-          className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors"
+          className="bg-primary hover:bg-primary/90 text-surface px-4 py-2 rounded-md font-medium text-sm flex items-center gap-2 transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Create Project
@@ -357,9 +358,20 @@ export default function ProjectsList() {
             />
           </div>
           
-          <div className="flex flex-col gap-1.5 mt-2">
+          <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Affected Applications</label>
-            <ApplicationInput applications={applications} onChange={setApplications} />
+            <MultiSelectWithSearch
+              value={appSearchQuery}
+              selectedIds={applications}
+              onSearch={setAppSearchQuery}
+              onSelect={(name) => { if (!applications.includes(name)) setApplications([...applications, name]); }}
+              onRemove={(name) => setApplications(prev => prev.filter(a => a !== name))}
+              options={applicationItems
+                .filter(a => a.name.toLowerCase().includes(appSearchQuery.toLowerCase()) && !applications.includes(a.name))
+                .map(a => ({ value: a.name, label: a.name }))}
+              placeholder="Search applications..."
+              getSelectedLabel={(name) => name}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -386,15 +398,15 @@ export default function ProjectsList() {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-primary">Start Date *</label>
-              <input 
-                type="date" required value={startDate} onChange={e => setStartDate(e.target.value)}
+              <DateInput
+                required value={startDate} onChange={setStartDate}
                 className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-primary">End Date</label>
-              <input 
-                type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
+              <DateInput
+                value={endDate} onChange={setEndDate}
                 className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
               />
             </div>
@@ -410,7 +422,7 @@ export default function ProjectsList() {
                      <span className="text-sm font-medium text-text-primary">{s.name}</span>
                      <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary font-medium uppercase tracking-wider">{s.role}</span>
                   </div>
-                  <button type="button" onClick={() => setStakeholders(prev => prev.filter((_, i) => i !== idx))} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1 rounded transition-colors">
+                  <button type="button" onClick={() => setStakeholders(prev => prev.filter((_, i) => i !== idx))} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1 rounded transition-colors cursor-pointer">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -450,7 +462,7 @@ export default function ProjectsList() {
                      }
                   }}
                   disabled={!newStakeholderId}
-                  className="px-3 py-1.5 bg-primary/10 text-primary rounded-md text-sm font-medium hover:bg-primary/20 transition-colors whitespace-nowrap disabled:opacity-50 h-[38px] flex items-center justify-center gap-1.5"
+                  className="px-3 py-1.5 bg-primary/10 text-primary rounded-md text-sm font-medium hover:bg-primary/20 transition-colors whitespace-nowrap disabled:opacity-50 h-[38px] flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add
                 </button>
@@ -488,7 +500,7 @@ export default function ProjectsList() {
                          <span className="text-[11px] text-text-secondary">{file.size ? (file.size / 1024).toFixed(1) + ' KB' : 'Unknown size'}</span>
                        </div>
                     </div>
-                    <button type="button" onClick={() => setSpecFiles(prev => prev.filter((_, i) => i !== idx))} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded transition-colors shrink-0">
+                    <button type="button" onClick={() => setSpecFiles(prev => prev.filter((_, i) => i !== idx))} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded transition-colors shrink-0 cursor-pointer">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -525,10 +537,10 @@ export default function ProjectsList() {
           </div>
 
           <div className="mt-6 flex justify-end gap-3">
-            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
+            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer">
               Cancel
             </button>
-            <button type="submit" data-testid="btn-submit-project" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+            <button type="submit" data-testid="btn-submit-project" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors cursor-pointer">
               Create Project
             </button>
           </div>

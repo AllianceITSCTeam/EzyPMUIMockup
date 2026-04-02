@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Card } from "@/components/ui/Card";
@@ -87,7 +87,7 @@ export default function ProjectReports() {
           <button 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-[0_1px_3px_rgb(0,0,0,0.02)] rounded-md text-sm font-medium text-text-primary hover:shadow-md transition-all border border-transparent hover:border-border-color"
+            className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-[0_1px_3px_rgb(0,0,0,0.02)] rounded-md text-sm font-medium text-text-primary hover:shadow-md transition-all border border-transparent hover:border-border-color cursor-pointer"
           >
             <Calendar className="w-4 h-4 text-text-secondary pr-0.5" />
             {dateRange} 
@@ -100,7 +100,7 @@ export default function ProjectReports() {
                 <button
                   key={opt}
                   onClick={() => { setDateRange(opt); setIsDropdownOpen(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                  className={`w-full text-left px-4 py-2 text-sm transition-colors cursor-pointer ${
                     dateRange === opt 
                       ? "bg-primary/5 text-primary font-bold" 
                       : "text-text-secondary hover:bg-page-bg/80 hover:text-text-primary font-medium"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { DateInput } from "@/components/ui/DateInput";
@@ -169,10 +169,10 @@ export function CreateTaskModal({ isOpen, onClose, defaultProjectId, defaultAssi
         </div>
         
         <div className="mt-6 flex justify-end gap-3">
-          <button type="button" onClick={onClose} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
+          <button type="button" onClick={onClose} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer">
             Cancel
           </button>
-          <button type="submit" data-testid="submit-create-task" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+          <button type="submit" data-testid="submit-create-task" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors cursor-pointer">
             Create Task
           </button>
         </div>

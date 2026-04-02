@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { X } from "lucide-react";
 import { useEffect } from "react";
@@ -33,7 +33,7 @@ export function Modal({ isOpen, onClose, title, children, className, contentClas
           <h2 className="text-lg font-bold text-text-primary tracking-tight">{title}</h2>
           <button 
             onClick={onClose}
-            className="text-text-secondary hover:text-danger transition-colors p-1.5 rounded-md hover:bg-page-bg -mr-1"
+            className="text-text-secondary hover:text-danger transition-colors p-1.5 rounded-md hover:bg-page-bg -mr-1 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

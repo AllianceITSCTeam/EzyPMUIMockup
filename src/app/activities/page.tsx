@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useStore } from "@/store/useStore";
@@ -101,7 +101,7 @@ export default function ActivitiesPage() {
                   setTypeFilter("all");
                   setUserFilter("all");
                 }}
-                className="mt-4 text-primary font-medium hover:underline"
+                className="mt-4 text-primary font-medium hover:underline cursor-pointer"
               >
                 Clear all filters
               </button>

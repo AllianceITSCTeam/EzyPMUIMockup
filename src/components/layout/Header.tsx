@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { Bell, Search as SearchIcon, LogOut, User as UserIcon, Settings, Moon, Sun, FolderKanban, CheckSquare, LayoutDashboard, ListTodo, Users as UsersIcon, BarChart2, Activity } from "lucide-react";
@@ -204,7 +204,7 @@ export function Header() {
           {mounted && (
             <button 
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="relative p-2 text-text-secondary hover:text-text-primary transition-colors focus:outline-none mr-1"
+              className="relative p-2 text-text-secondary hover:text-text-primary transition-colors focus:outline-none mr-1 cursor-pointer"
             >
               {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -212,7 +212,7 @@ export function Header() {
 
           <button  
             onClick={() => setShowNotifs(!showNotifs)}
-            className="relative p-2 text-text-secondary hover:text-text-primary transition-colors focus:outline-none"
+            className="relative p-2 text-text-secondary hover:text-text-primary transition-colors focus:outline-none cursor-pointer"
           >
             <Bell className="w-5 h-5" />
             {activities.length > 0 && (
@@ -288,7 +288,7 @@ export function Header() {
               <div className="border-t border-border-color/30 mt-1 mx-2 mb-2 pt-2">
                 <button 
                   onClick={() => router.push('/login')}
-                  className="w-full text-left px-3 py-2 text-sm text-danger hover:bg-danger/10 hover:text-danger rounded-md transition-colors flex items-center gap-2 font-medium"
+                  className="w-full text-left px-3 py-2 text-sm text-danger hover:bg-danger/10 hover:text-danger rounded-md transition-colors flex items-center gap-2 font-medium cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" /> Sign Out
                 </button>

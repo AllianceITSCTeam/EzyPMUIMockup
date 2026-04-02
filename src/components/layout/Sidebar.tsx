@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,7 +23,7 @@ export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean; setCo
       }`}
     >
       <div className="h-14 flex items-center px-4 shrink-0 gap-3">
-        <button onClick={() => setCollapsed(!collapsed)} className="p-1 hover:bg-page-bg rounded-md text-text-secondary">
+        <button onClick={() => setCollapsed(!collapsed)} className="p-1 hover:bg-page-bg rounded-md text-text-secondary cursor-pointer">
           <Menu className="w-5 h-5" />
         </button>
         {!collapsed && <span className="font-bold text-primary truncate">EzyPM</span>}

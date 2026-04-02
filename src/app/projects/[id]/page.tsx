@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useStore } from "@/store/useStore";
@@ -10,9 +10,10 @@ import { DateProgressBar } from "@/components/ui/DateProgressBar";
 import { StatusBadge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Modal } from "@/components/ui/Modal";
-import { ApplicationInput } from "@/components/ui/ApplicationInput";
+import { MultiSelectWithSearch } from "@/components/ui/MultiSelectWithSearch";
 import { UserAvatar } from "@/components/ui/UserAvatar";
 import { CustomSelect } from "@/components/ui/CustomSelect";
+import { DateInput } from "@/components/ui/DateInput";
 import { SkillTag } from "@/components/ui/SkillTag";
 import { formatDate, calcBusinessDays } from "@/lib/utils";
 import { CreateTaskModal } from "@/components/ui/CreateTaskModal";
@@ -22,7 +23,7 @@ export default function ProjectDetails() {
   const router = useRouter();
   const params = useParams();
   const projectId = params?.id as string;
-  const { projects, users, tasks, companies, addToast, logActivity, updateProject, addRecentLink, addStakeholder, removeStakeholder, addResourceToProject, removeResourceFromProject } = useStore();
+  const { projects, users, tasks, companies, applicationItems, addToast, logActivity, updateProject, addRecentLink, addStakeholder, removeStakeholder, addResourceToProject, removeResourceFromProject } = useStore();
   const [activeTab, setActiveTab] = useState<"gantt" | "tasks" | "resources" | "stakeholders">("gantt");
   const [isAddResourceOpen, setIsAddResourceOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -115,6 +116,9 @@ export default function ProjectDetails() {
   });
   const [newEditStakeholderId, setNewEditStakeholderId] = useState("");
   const [newEditStakeholderRole, setNewEditStakeholderRole] = useState("Client");
+  const [editCompanySearchQuery, setEditCompanySearchQuery] = useState("");
+  const [editAppSearchQuery, setEditAppSearchQuery] = useState("");
+  const editSpecFileInputRef = useRef<HTMLInputElement>(null);
 
   if (!project) {
     return (
@@ -259,7 +263,7 @@ export default function ProjectDetails() {
               });
               setIsEditModalOpen(true);
             }}
-            className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-sm rounded-md text-sm font-medium text-text-primary hover:shadow-md transition-shadow"
+            className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-sm rounded-md text-sm font-medium text-text-primary hover:shadow-md transition-shadow cursor-pointer"
           >
             <Pencil className="w-4 h-4" /> Edit
           </button>
@@ -276,7 +280,7 @@ export default function ProjectDetails() {
               </h3>
               <button 
                 onClick={() => setIsSidebarOpen(false)}
-                className="text-text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-page-bg opacity-50 hover:opacity-100"
+                className="text-text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-page-bg opacity-50 hover:opacity-100 cursor-pointer"
                 title="Collapse Sidebar"
               >
                 <PanelLeftClose className="w-4 h-4" />
@@ -409,7 +413,7 @@ export default function ProjectDetails() {
               </button>
           <button 
             onClick={() => setActiveTab("gantt")}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
               activeTab === "gantt" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -418,7 +422,7 @@ export default function ProjectDetails() {
           </button>
           <button 
             onClick={() => setActiveTab("tasks")}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
               activeTab === "tasks" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -427,7 +431,7 @@ export default function ProjectDetails() {
           </button>
           <button 
             onClick={() => setActiveTab("resources")}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
               activeTab === "resources" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -436,7 +440,7 @@ export default function ProjectDetails() {
           </button>
           <button 
             onClick={() => setActiveTab("stakeholders")}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
               activeTab === "stakeholders" ? "bg-surface shadow-sm text-primary" : "text-text-secondary hover:text-text-primary"
             }`}
           >
@@ -452,7 +456,7 @@ export default function ProjectDetails() {
                 <h4 className="font-semibold text-text-primary">Assigned Resources ({projectUsers.length})</h4>
                 <button 
                   onClick={() => setIsAddResourceOpen(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-sm rounded-md text-xs font-medium text-text-primary hover:shadow-md transition-shadow"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-sm rounded-md text-xs font-medium text-text-primary hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add Resource
                 </button>
@@ -495,7 +499,7 @@ export default function ProjectDetails() {
                             addToast("success", `Removed ${user.name} from project.`);
                             logActivity(`Removed ${user.name} from project ${project.name}`);
                           }}
-                          className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded-md transition-all opacity-0 group-hover:opacity-100"
+                          className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded-md transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
                           title="Remove from project"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -515,13 +519,13 @@ export default function ProjectDetails() {
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={() => setIsCreateTaskOpen(true)}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] rounded-md text-xs font-medium text-text-primary hover:bg-page-bg transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] rounded-md text-xs font-medium text-text-primary hover:bg-page-bg transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" /> Create Task
                   </button>
                   <button 
                     onClick={() => router.push(`/tasks?project=${project.id}`)}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-primary text-surface rounded-md text-xs font-medium hover:bg-primary/90 transition-colors"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-primary text-surface rounded-md text-xs font-medium hover:bg-primary/90 transition-colors cursor-pointer"
                   >
                     Go to Kanban Board <ChevronRight className="w-3.5 h-3.5" />
                   </button>
@@ -632,20 +636,20 @@ export default function ProjectDetails() {
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => setIsCreateTaskOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-surface rounded-md text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-surface rounded-md text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" /> Create Task
                     </button>
                     <div className="w-px h-5 bg-border-color/50 mx-1"></div>
                     <button 
                       onClick={() => setGanttExpandedTasks(new Set(projectTasks.map(t => t.id)))}
-                      className="px-2.5 py-1 text-[11px] font-medium text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors"
+                      className="px-2.5 py-1 text-[11px] font-medium text-primary bg-primary/10 rounded hover:bg-primary/20 transition-colors cursor-pointer"
                     >
                       Expand All
                     </button>
                     <button 
                       onClick={() => setGanttExpandedTasks(new Set())}
-                      className="px-2.5 py-1 text-[11px] font-medium text-text-secondary bg-page-bg rounded hover:bg-black/5 transition-colors border border-border-color"
+                      className="px-2.5 py-1 text-[11px] font-medium text-text-secondary bg-page-bg rounded hover:bg-black/5 transition-colors border border-border-color cursor-pointer"
                     >
                       Collapse All
                     </button>
@@ -668,7 +672,7 @@ export default function ProjectDetails() {
                             {t.hasChildren ? (
                               <button 
                                 onClick={() => toggleGanttExpand(t.id)}
-                                className="w-5 h-5 flex items-center justify-center shrink-0 text-text-secondary hover:text-primary transition-colors hover:bg-primary/10 rounded -ml-1 mr-1"
+                                className="w-5 h-5 flex items-center justify-center shrink-0 text-text-secondary hover:text-primary transition-colors hover:bg-primary/10 rounded -ml-1 mr-1 cursor-pointer"
                               >
                                 {t.isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                               </button>
@@ -703,7 +707,7 @@ export default function ProjectDetails() {
                                 setEditingTaskId(t.id);
                                 setIsEditTaskModalOpen(true);
                               }}
-                              className="text-text-secondary hover:text-primary p-1 rounded hover:bg-primary/10 transition-colors"
+                              className="text-text-secondary hover:text-primary p-1 rounded hover:bg-primary/10 transition-colors cursor-pointer"
                               title="Edit Task"
                             >
                               <Pencil className="w-3.5 h-3.5" />
@@ -799,7 +803,7 @@ export default function ProjectDetails() {
                 <h4 className="font-semibold text-text-primary">Project Stakeholders ({(project.stakeholders || []).length})</h4>
                 <button 
                   onClick={() => setIsAddStakeholderOpen(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-sm rounded-md text-xs font-medium text-text-primary hover:shadow-md transition-shadow"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-sm rounded-md text-xs font-medium text-text-primary hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add Stakeholder
                 </button>
@@ -840,7 +844,7 @@ export default function ProjectDetails() {
                             addToast("success", `Removed ${sh.name} from stakeholders.`);
                             logActivity(`Removed stakeholder ${sh.name} from project ${project.name}`);
                           }}
-                          className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded-md transition-all opacity-0 group-hover:opacity-100"
+                          className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded-md transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
                           title="Remove stakeholder"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -874,80 +878,50 @@ export default function ProjectDetails() {
               </button>
             </div>
             
-            <form onSubmit={handleAddResource} className="p-4 flex flex-col gap-4">
+              <form onSubmit={handleAddResource} className="p-4 flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-text-primary mb-1">Select Team Members <span className="text-danger">*</span></label>
-                
-                <div className="relative mb-2">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary opacity-60" />
-                  <input 
-                    type="text" 
-                    placeholder="Search by name, role or skill..." 
-                    value={resourceSearchQuery}
-                    onChange={e => setResourceSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-page-bg/50 border border-transparent rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
-                  />
-                </div>
-                
-                <div className="flex flex-col gap-0.5 h-64 overflow-y-auto bg-transparent py-1.5 -mx-1 px-1">
-                  {availableUsers.length === 0 && (
-                    <p className="text-sm text-text-secondary text-center py-4">No available members to add.</p>
-                  )}
-                  {availableUsers
-                    .filter(u => 
-                      u.name.toLowerCase().includes(resourceSearchQuery.toLowerCase()) || 
-                      u.role.toLowerCase().includes(resourceSearchQuery.toLowerCase()) || 
+                <label className="text-sm font-medium text-text-primary">Select Team Members <span className="text-danger">*</span></label>
+                <MultiSelectWithSearch
+                  value={resourceSearchQuery}
+                  selectedIds={selectedUsers}
+                  onSearch={setResourceSearchQuery}
+                  onSelect={(userId) => {
+                    if (!selectedUsers.includes(userId)) setSelectedUsers([...selectedUsers, userId]);
+                  }}
+                  onRemove={(userId) => setSelectedUsers(prev => prev.filter(id => id !== userId))}
+                  options={availableUsers
+                    .filter(u =>
+                      u.name.toLowerCase().includes(resourceSearchQuery.toLowerCase()) ||
+                      u.role.toLowerCase().includes(resourceSearchQuery.toLowerCase()) ||
                       u.skills.some(s => s.toLowerCase().includes(resourceSearchQuery.toLowerCase()))
                     )
-                    .map(u => {
-                    const isSelected = selectedUsers.includes(u.id);
-                    return (
-                      <div 
-                        key={u.id}
-                        onClick={() => toggleUser(u.id)}
-                        className={`flex items-center gap-3 p-2 rounded-md cursor-pointer transition-colors ${
-                          isSelected ? "bg-primary/5 text-primary font-medium" : "hover:bg-page-bg/80 text-text-primary"
-                        }`}
-                      >
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
-                          isSelected ? "bg-primary border-primary" : "border-border-color/60 bg-surface/80 shadow-[inset_0_1px_2px_rgb(0,0,0,0.03)]"
-                        }`}>
-                          {isSelected && <svg className="w-3 h-3 text-surface" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                        </div>
-                        <UserAvatar user={u} size="sm" />
-                        <div className="flex flex-col flex-1 min-w-0">
-                          <span className="truncate">{u.name}</span>
-                          <span className="text-[11px] font-normal text-text-secondary truncate">{u.role}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                
-                <p className="text-xs text-text-secondary mt-1">
-                  {selectedUsers.length === 0 
-                    ? `Select at least one member to invite to ${project.name}.` 
-                    : `${selectedUsers.length} member(s) selected.`}
-                </p>
-                <div className="flex flex-col gap-1 mt-4 pt-4 border-t border-border-color/30">
-                  <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Project Role</label>
-                  <select 
-                    value={selectedResourceRole}
-                    onChange={(e) => setSelectedResourceRole(e.target.value)}
-                    className="w-full px-3 py-2 bg-surface/50 border border-transparent hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none text-text-primary shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)]"
-                  >
-                    <option value="Member">Member</option>
-                    <option value="PM">Project Manager (PM)</option>
-                    <option value="BA">Business Analyst (BA)</option>
-                    <option value="Frontend">Frontend Developer</option>
-                    <option value="Backend">Backend Developer</option>
-                    <option value="Fullstack">Fullstack Developer</option>
-                    <option value="QC">Quality Control (QC)</option>
-                    <option value="QA">Quality Assurance (QA)</option>
-                    <option value="DevOps">DevOps Engineer</option>
-                    <option value="Design">Designer / UI/UX</option>
-                  </select>
-                </div>
+                    .map(u => ({ value: u.id, label: `${u.name} — ${u.role}` }))}
+                  placeholder="Search by name, role or skill..."
+                  getSelectedLabel={(id) => users.find(u => u.id === id)?.name || id}
+                />
+                {selectedUsers.length === 0
+                  ? <p className="text-xs text-text-secondary">Select at least one member to add to {project.name}.</p>
+                  : <p className="text-xs text-primary font-medium">{selectedUsers.length} member(s) selected.</p>}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">Project Role</label>
+                <CustomSelect
+                  value={selectedResourceRole}
+                  onChange={(val: any) => setSelectedResourceRole(val)}
+                  options={[
+                    { value: "Member", label: "Member" },
+                    { value: "PM", label: "Project Manager (PM)" },
+                    { value: "BA", label: "Business Analyst (BA)" },
+                    { value: "Frontend", label: "Frontend Developer" },
+                    { value: "Backend", label: "Backend Developer" },
+                    { value: "Fullstack", label: "Fullstack Developer" },
+                    { value: "QC", label: "Quality Control (QC)" },
+                    { value: "QA", label: "Quality Assurance (QA)" },
+                    { value: "DevOps", label: "DevOps Engineer" },
+                    { value: "Design", label: "Designer / UI/UX" },
+                  ]}
+                />
               </div>
 
               <div className="flex justify-end gap-3 mt-4 pt-4">
@@ -1046,7 +1020,7 @@ export default function ProjectDetails() {
                      <span className="text-sm font-medium text-text-primary">{s.name}</span>
                      <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded text-primary font-medium uppercase tracking-wider">{s.role}</span>
                   </div>
-                  <button type="button" onClick={() => setEditForm({...editForm, stakeholders: editForm.stakeholders.filter((_, i) => i !== idx)})} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1 rounded transition-colors">
+                  <button type="button" onClick={() => setEditForm({...editForm, stakeholders: editForm.stakeholders.filter((_, i) => i !== idx)})} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1 rounded transition-colors cursor-pointer">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -1086,7 +1060,7 @@ export default function ProjectDetails() {
                      }
                   }}
                   disabled={!newEditStakeholderId}
-                  className="px-3 py-1.5 bg-primary/10 text-primary rounded-md text-sm font-medium hover:bg-primary/20 transition-colors whitespace-nowrap disabled:opacity-50 h-[38px] flex items-center justify-center gap-1.5"
+                  className="px-3 py-1.5 bg-primary/10 text-primary rounded-md text-sm font-medium hover:bg-primary/20 transition-colors whitespace-nowrap disabled:opacity-50 h-[38px] flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add
                 </button>
@@ -1104,54 +1078,49 @@ export default function ProjectDetails() {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Companies</label>
-            <div className="relative">
-              <CustomSelect 
-                value=""
-                onChange={(val: any) => {
-                  if (val && !editForm.companyIds?.includes(val)) {
-                    setEditForm({...editForm, companyIds: [...(editForm.companyIds || []), val]});
-                  }
-                }}
-                options={[
-                  { value: "", label: "Select Company..." },
-                  ...companies.filter(c => !(editForm.companyIds || []).includes(c.id)).map(c => ({ value: c.id, label: c.name }))
-                ]}
-              />
-            </div>
-          </div>
-          
-          {(editForm.companyIds?.length || 0) > 0 && (
-            <div className="flex flex-wrap gap-2 mt-[-8px]">
-              {editForm.companyIds?.map(id => {
-                const comp = companies.find(c => c.id === id);
-                if (!comp) return null;
-                return (
-                  <div key={id} className="flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-md text-[13px] font-medium border border-primary/20">
-                    <Building2 className="w-3.5 h-3.5" />
-                    {comp.name}
-                    <button type="button" onClick={() => setEditForm({...editForm, companyIds: editForm.companyIds!.filter(cId => cId !== id)})} className="hover:text-danger ml-1">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="flex flex-col gap-1.5 mt-2">
-            <label className="text-sm font-medium text-text-primary">Applications</label>
-            <ApplicationInput 
-              applications={editForm.applications || []} 
-              onChange={(apps: string[]) => setEditForm({ ...editForm, applications: apps })} 
+            <MultiSelectWithSearch
+              value={editCompanySearchQuery}
+              selectedIds={editForm.companyIds || []}
+              onSearch={setEditCompanySearchQuery}
+              onSelect={(id) => {
+                if (!(editForm.companyIds || []).includes(id))
+                  setEditForm({ ...editForm, companyIds: [...(editForm.companyIds || []), id] });
+              }}
+              onRemove={(id) => setEditForm({ ...editForm, companyIds: (editForm.companyIds || []).filter(c => c !== id) })}
+              options={companies
+                .filter(c => c.name.toLowerCase().includes(editCompanySearchQuery.toLowerCase()) && !(editForm.companyIds || []).includes(c.id))
+                .map(c => ({ value: c.id, label: c.name }))}
+              placeholder="Search companies..."
+              getSelectedLabel={(id) => companies.find(c => c.id === id)?.name || id}
             />
           </div>
 
           <div className="flex flex-col gap-1.5 mt-2">
-            <label className="text-sm font-medium text-text-primary flex items-center justify-between">
-              <span>Spec Files <span className="text-text-secondary font-normal">(optional)</span></span>
+            <label className="text-sm font-medium text-text-primary">Applications</label>
+            <MultiSelectWithSearch
+              value={editAppSearchQuery}
+              selectedIds={editForm.applications || []}
+              onSearch={setEditAppSearchQuery}
+              onSelect={(name) => {
+                if (!(editForm.applications || []).includes(name))
+                  setEditForm({ ...editForm, applications: [...(editForm.applications || []), name] });
+              }}
+              onRemove={(name) => setEditForm({ ...editForm, applications: (editForm.applications || []).filter(a => a !== name) })}
+              options={applicationItems
+                .filter(a => a.name.toLowerCase().includes(editAppSearchQuery.toLowerCase()) && !(editForm.applications || []).includes(a.name))
+                .map(a => ({ value: a.name, label: a.name }))}
+              placeholder="Search applications..."
+              getSelectedLabel={(name) => name}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5 mt-2">
+            <div className="text-sm font-medium text-text-primary flex items-center justify-between">
+              <span>Spec Files</span>
               <label className="cursor-pointer text-primary hover:text-primary/80 flex items-center gap-1 text-xs font-semibold">
                 <Paperclip className="w-3.5 h-3.5" /> Attach Files
                 <input 
+                  ref={editSpecFileInputRef}
                   type="file" multiple className="hidden" 
                   onChange={(e) => {
                     if (e.target.files) {
@@ -1161,7 +1130,7 @@ export default function ProjectDetails() {
                   }} 
                 />
               </label>
-            </label>
+            </div>
             {(editForm.specFiles?.length || 0) > 0 && (
               <div className="flex flex-col gap-2 mt-1">
                 {editForm.specFiles?.map((file, idx) => (
@@ -1175,7 +1144,7 @@ export default function ProjectDetails() {
                          <span className="text-[11px] text-text-secondary">{file.size ? (file.size / 1024).toFixed(1) + ' KB' : 'Unknown size'}</span>
                        </div>
                     </div>
-                    <button type="button" onClick={() => setEditForm({...editForm, specFiles: editForm.specFiles!.filter((_, i) => i !== idx)})} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded transition-colors shrink-0">
+                    <button type="button" onClick={() => setEditForm({...editForm, specFiles: editForm.specFiles!.filter((_, i) => i !== idx)})} className="text-text-secondary hover:text-danger hover:bg-danger/10 p-1.5 rounded transition-colors shrink-0 cursor-pointer">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -1183,7 +1152,10 @@ export default function ProjectDetails() {
               </div>
             )}
             {(editForm.specFiles?.length || 0) === 0 && (
-              <div className="border border-dashed border-border-color/30 rounded-lg p-6 flex flex-col items-center justify-center text-text-secondary bg-page-bg/30">
+              <div
+                role="button"
+                onClick={() => editSpecFileInputRef.current?.click()}
+                className="border border-dashed border-border-color/30 rounded-lg p-6 flex flex-col items-center justify-center text-text-secondary bg-page-bg/30 cursor-pointer hover:bg-page-bg/60 hover:border-primary/30 transition-colors">
                 <Paperclip className="w-8 h-8 opacity-40 mb-2" />
                 <p className="text-sm text-text-primary font-medium">No files attached</p>
                 <p className="text-xs text-text-secondary">Click 'Attach Files' to upload specs</p>
@@ -1210,25 +1182,25 @@ export default function ProjectDetails() {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-primary">Start Date</label>
-              <input 
-                type="date" required value={editForm.startDate} onChange={e => setEditForm({...editForm, startDate: e.target.value})}
-                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary"
+              <DateInput
+                required value={editForm.startDate} onChange={v => setEditForm({...editForm, startDate: v})}
+                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-primary">End Date</label>
-              <input 
-                type="date" value={editForm.endDate} onChange={e => setEditForm({...editForm, endDate: e.target.value})}
-                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary"
+              <DateInput
+                value={editForm.endDate} onChange={v => setEditForm({...editForm, endDate: v})}
+                className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
               />
             </div>
           </div>
 
           <div className="mt-4 flex justify-end gap-3">
-            <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
+            <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors cursor-pointer">
               Save Changes
             </button>
           </div>
@@ -1324,7 +1296,7 @@ export default function ProjectDetails() {
               setIsAddStakeholderOpen(false);
               setStakeholderForm({ name: "", role: "Client", isCustom: true, id: "" });
               setStakeholderSearchQuery("");
-            }} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
+            }} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer">
               Cancel
             </button>
             <button type="submit" disabled={!stakeholderForm.name.trim()} className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50">
@@ -1441,10 +1413,10 @@ export default function ProjectDetails() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-text-primary">Due Date</label>
-                <input 
-                  type="date" value={taskEditForm.dueDate}
-                  onChange={e => setTaskEditForm({...taskEditForm, dueDate: e.target.value})}
-                  className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm text-text-primary"
+                <DateInput
+                  value={taskEditForm.dueDate}
+                  onChange={v => setTaskEditForm({...taskEditForm, dueDate: v})}
+                  className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -1465,7 +1437,7 @@ export default function ProjectDetails() {
                   setIsEditTaskModalOpen(false);
                   setEditingTaskId(null);
                 }}
-                className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors"
+                className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer"
               >
                 Cancel
               </button>

@@ -105,7 +105,7 @@ export function CustomSelect({ value, options, onChange, placeholder = "Select..
       <button
         type="button"
         data-testid={testId || "custom-select-trigger"}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => { if (!isOpen) updateCoords(); setIsOpen(!isOpen); }}
         className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all text-text-primary bg-surface shadow-sm hover:shadow-md cursor-pointer outline-none w-full justify-between focus:ring-2 focus:ring-primary/20 hover:bg-surface/80"
       >
         <div className="flex items-center gap-2 truncate">

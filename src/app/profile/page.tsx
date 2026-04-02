@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useStore } from "@/store/useStore";
@@ -51,7 +51,7 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          <button className="text-sm font-medium text-primary hover:underline px-3 py-1.5 bg-primary/10 rounded-md">
+          <button className="text-sm font-medium text-primary hover:underline px-3 py-1.5 bg-primary/10 rounded-md cursor-pointer">
             Change avatar
           </button>
         </div>
@@ -113,7 +113,7 @@ export default function Profile() {
           </div>
 
           <div className="mt-4 pt-6 border-t border-border-color flex justify-end">
-            <button type="submit" className="px-6 py-2.5 bg-primary text-surface font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm focus:outline-none focus:ring-4 focus:ring-primary/30">
+            <button type="submit" className="px-6 py-2.5 bg-primary text-surface font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm focus:outline-none focus:ring-4 focus:ring-primary/30 cursor-pointer">
               Save Changes
             </button>
           </div>

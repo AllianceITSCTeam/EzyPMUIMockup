@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -181,7 +181,7 @@ export default function TaskDetails() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 text-text-secondary">
         <p className="text-lg">Task not found</p>
-        <button onClick={() => router.push("/tasks")} className="text-primary hover:underline flex items-center gap-1">
+        <button onClick={() => router.push("/tasks")} className="text-primary hover:underline flex items-center gap-1 cursor-pointer">
           <ArrowLeft className="w-4 h-4" /> Back to Tasks
         </button>
       </div>
@@ -483,7 +483,7 @@ export default function TaskDetails() {
                       {link.type}
                     </span>
                     <Link href={link.url} className="font-medium hover:underline text-text-primary truncate max-w-[200px]">{link.title}</Link>
-                    <button onClick={() => setLinks(links.filter(l => l.id !== link.id))} className="text-text-secondary hover:text-danger ml-auto p-1 rounded hover:bg-danger/10 transition-colors">
+                    <button onClick={() => setLinks(links.filter(l => l.id !== link.id))} className="text-text-secondary hover:text-danger ml-auto p-1 rounded hover:bg-danger/10 transition-colors cursor-pointer">
                       ✕
                     </button>
                   </div>
@@ -492,16 +492,17 @@ export default function TaskDetails() {
                 {isAddingLink ? (
                   <div className="relative">
                     <div className="flex items-center gap-2 p-2 bg-surface shadow-[0_2px_8px_rgb(0,0,0,0.04)] rounded-md border border-primary/50 flex-wrap">
-                      <select 
+                      <CustomSelect
                         value={newLinkType}
-                        onChange={e => setNewLinkType(e.target.value)}
-                        className="bg-page-bg border-none focus:outline-none text-xs px-2 py-1.5 rounded text-text-secondary font-medium outline-none cursor-pointer"
-                      >
-                        <option value="Relates to">Relates to</option>
-                        <option value="Blocks">Blocks</option>
-                        <option value="Is blocked by">Is blocked by</option>
-                        <option value="Duplicates">Duplicates</option>
-                      </select>
+                        onChange={(val: any) => setNewLinkType(val)}
+                        options={[
+                          { value: "Relates to", label: "Relates to" },
+                          { value: "Blocks", label: "Blocks" },
+                          { value: "Is blocked by", label: "Is blocked by" },
+                          { value: "Duplicates", label: "Duplicates" },
+                        ]}
+                        renderOption={(v: string, label?: string) => label || v}
+                      />
                       <input 
                         autoFocus
                         type="text" 
@@ -514,7 +515,7 @@ export default function TaskDetails() {
                         placeholder="Search tasks..."
                         className="flex-1 min-w-[150px] bg-transparent border-none focus:outline-none text-sm px-2 text-text-primary"
                       />
-                      <button onClick={() => setIsAddingLink(false)} className="text-text-secondary hover:text-danger p-1 rounded hover:bg-page-bg transition-colors">
+                      <button onClick={() => setIsAddingLink(false)} className="text-text-secondary hover:text-danger p-1 rounded hover:bg-page-bg transition-colors cursor-pointer">
                         ✕
                       </button>
                     </div>
@@ -630,7 +631,7 @@ export default function TaskDetails() {
                 <div className="text-sm text-text-secondary italic mt-1 flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full border border-dashed border-border-color flex items-center justify-center">?</div>
                   Unassigned
-                  <button className="text-primary text-xs ml-auto hover:underline font-medium">Assign me</button>
+                  <button className="text-primary text-xs ml-auto hover:underline font-medium cursor-pointer">Assign me</button>
                 </div>
               )}
             </div>
@@ -658,7 +659,7 @@ export default function TaskDetails() {
           <Card className="p-5 flex flex-col gap-4 bg-primary/5">
             <div className="flex justify-between items-center mb-1">
               <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Time Tracking</h3>
-              <button onClick={() => { setLogDate(new Date().toISOString().split("T")[0]); setIsLogModalOpen(true); }} className="flex items-center gap-1.5 text-xs font-bold bg-primary text-surface px-2.5 py-1.5 rounded hover:bg-primary/90 transition-colors">
+              <button onClick={() => { setLogDate(new Date().toISOString().split("T")[0]); setIsLogModalOpen(true); }} className="flex items-center gap-1.5 text-xs font-bold bg-primary text-surface px-2.5 py-1.5 rounded hover:bg-primary/90 transition-colors cursor-pointer">
                 <Clock className="w-3.5 h-3.5" /> Log Hours
               </button>
             </div>
@@ -825,10 +826,10 @@ export default function TaskDetails() {
           </div>
 
           <div className="mt-4 flex justify-end gap-3 pt-4 border-t border-border-color">
-            <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
+            <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors cursor-pointer">
               Save Changes
             </button>
           </div>
@@ -849,9 +850,9 @@ export default function TaskDetails() {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">Date *</label>
-            <input 
-              type="date" required value={logDate} onChange={e => setLogDate(e.target.value)}
-              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-text-primary"
+            <DateInput
+              required value={logDate} onChange={setLogDate}
+              className="px-3 py-2 bg-surface/50 border border-transparent shadow-[inset_0_1px_3px_rgb(0,0,0,0.02)] hover:bg-page-bg focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all rounded-md text-sm focus:outline-none focus:border-primary/30 text-text-primary"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -879,10 +880,10 @@ export default function TaskDetails() {
             )}
           </div>
           <div className="mt-4 flex gap-3 pt-2">
-            <button type="button" onClick={() => setIsLogModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
+            <button type="button" onClick={() => setIsLogModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer">
               Cancel
             </button>
-            <button type="submit" className="flex-1 px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+            <button type="submit" className="flex-1 px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors cursor-pointer">
               Save Log
             </button>
           </div>
@@ -978,10 +979,10 @@ export default function TaskDetails() {
             </div>
           </div>
           <div className="mt-4 flex justify-end gap-3 pt-4 border-t border-border-color">
-            <button type="button" onClick={() => setIsCreateSubtaskModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors">
+            <button type="button" onClick={() => setIsCreateSubtaskModalOpen(false)} className="px-4 py-2 rounded-md text-sm font-medium text-text-secondary hover:bg-page-bg transition-colors cursor-pointer">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors">
+            <button type="submit" className="px-4 py-2 rounded-md text-sm font-medium bg-primary text-surface hover:bg-primary/90 transition-colors cursor-pointer">
               Create Subtask
             </button>
           </div>

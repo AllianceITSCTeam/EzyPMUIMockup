@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -38,7 +38,7 @@ export default function UserDetails() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 text-text-secondary">
         <p className="text-lg">User not found</p>
-        <button onClick={() => router.push("/team")} className="text-primary hover:underline flex items-center gap-1">
+        <button onClick={() => router.push("/team")} className="text-primary hover:underline flex items-center gap-1 cursor-pointer">
           <ArrowLeft className="w-4 h-4" /> Back to Team
         </button>
       </div>
@@ -86,7 +86,7 @@ export default function UserDetails() {
               setEditForm({ name: user.name, phone: user.phone || "", skills: user.skills || [], notes: user.notes || "" });
               setIsEditOpen(true);
             }}
-            className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-sm rounded-md text-sm font-medium text-text-primary hover:shadow-md transition-shadow"
+            className="flex items-center gap-2 px-3 py-1.5 bg-surface shadow-sm rounded-md text-sm font-medium text-text-primary hover:shadow-md transition-shadow cursor-pointer"
           >
             <Pencil className="w-4 h-4" /> Edit Profile
           </button>
@@ -196,7 +196,7 @@ export default function UserDetails() {
             <h3 className="font-bold text-lg text-text-primary">Active Tasks</h3>
             <button 
               onClick={() => setIsCreateTaskOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-color shadow-sm rounded-md text-xs font-medium text-text-primary hover:bg-page-bg transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-border-color shadow-sm rounded-md text-xs font-medium text-text-primary hover:bg-page-bg transition-colors cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" /> Create Task
             </button>
@@ -242,7 +242,7 @@ export default function UserDetails() {
           <div className="bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-border-color">
             <div className="flex justify-between items-center p-4 border-b border-border-color bg-page-bg">
               <h3 className="font-bold text-lg text-text-primary">Edit Profile</h3>
-              <button onClick={() => setIsEditOpen(false)} className="text-text-secondary hover:text-danger transition-colors">
+              <button onClick={() => setIsEditOpen(false)} className="text-text-secondary hover:text-danger transition-colors cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
