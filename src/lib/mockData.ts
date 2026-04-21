@@ -202,6 +202,54 @@ export const MOCK_PROJECTS: Project[] = [
       { id: "sh-client-3", name: "Internal HR Team", role: "Client", isCustom: true },
       { id: "sh-partner-3", name: "Source Recruitment", role: "Partner", isCustom: true }
     ]
+  },
+  {
+    id: "p9",
+    name: "DEB Source",
+    description: "LLM Integration into DEB SMSF Platform. Intelligent Document Analysis & Auto-Population Engine",
+    status: "Active",
+    estimateSource: "TASK",
+    startDate: "2026-05-01",
+    endDate: "",
+    estimateHours: 0,
+    actualHours: 0,
+    remainingHours: 0,
+    progressPercentage: 0,
+    resourceCount: 4,
+    taskCount: 0,
+    themeColor: THEME_COLORS[8],
+    avatarUrl: "",
+    resources: [{ userId: "u9", role: "BA" }, { userId: "u19", role: "Backend" }, { userId: "u15", role: "Frontend" }, { userId: "u14", role: "QC" }],
+    companyIds: ["comp-3", "comp-1"],
+    specFiles: [],
+    stakeholders: [
+      { id: "sh-client-3", name: "Internal HR Team", role: "Client", isCustom: true },
+      { id: "sh-partner-3", name: "Source Recruitment", role: "Partner", isCustom: true }
+    ]
+  },
+  {
+    id: "p10",
+    name: "MEzy AI DEB_Artefact",
+    description: "DEB Auto-Population from MEzy AI. Wiring Existing MEzy AI JSON Output into DEB Journey Fields",
+    status: "Active",
+    estimateSource: "TASK",
+    startDate: "2026-05-01",
+    endDate: "",
+    estimateHours: 0,
+    actualHours: 0,
+    remainingHours: 0,
+    progressPercentage: 0,
+    resourceCount: 4,
+    taskCount: 0,
+    themeColor: THEME_COLORS[8],
+    avatarUrl: "",
+    resources: [{ userId: "u9", role: "BA" }, { userId: "u19", role: "Backend" }, { userId: "u15", role: "Frontend" }, { userId: "u14", role: "QC" }],
+    companyIds: ["comp-3", "comp-1"],
+    specFiles: [ ],
+    stakeholders: [
+      { id: "sh-client-3", name: "Internal HR Team", role: "Client", isCustom: true },
+      { id: "sh-partner-3", name: "Source Recruitment", role: "Partner", isCustom: true }
+    ]
   }
 ];
 
@@ -350,7 +398,67 @@ export const MOCK_TASKS: Task[] = [
   {
     id: "t33", projectId: "p1", title: "Final Polish & Go Live", description: "Production deployment",
     status: "No Specs", priority: "High", assigneeId: "u1", estimateHours: 20, actualHours: 0, startDate: "2026-05-20", dueDate: "2026-05-25", parentId: "p1_phase3"
-  }
+  },
+  // ── LLM Integration Project (p9) ───────────────────────────────────────────
+  // Phase 0: Initiation (2026-05-01 → 2026-05-14)
+  { id: "t1001", projectId: "p9", title: "Stakeholder alignment workshops", description: "Align on scope, priorities, and success criteria with Mick, Mel, Pat, and credit team", status: "To Do", priority: "Medium", assigneeId: "u5", estimateHours: 40, actualHours: 0, startDate: "2026-05-01", dueDate: "2026-05-07", oneDeskId: "" },
+  { id: "t1002", projectId: "p9", title: "Infrastructure & environment setup", description: "Provision cloud environments, CI/CD pipelines, dev/staging/prod", status: "To Do", priority: "High", assigneeId: "u12", estimateHours: 40, actualHours: 0, startDate: "2026-05-08", dueDate: "2026-05-14", oneDeskId: "" },
+  // Phase 1: Discovery & PoC (2026-05-15 → 2026-06-11)
+  { id: "t1003", projectId: "p9", title: "Document corpus collection", description: "Gather 50+ sample documents per type from production (anonymised)", status: "To Do", priority: "Medium", assigneeId: "u3", estimateHours: 80, actualHours: 0, startDate: "2026-05-15", dueDate: "2026-05-28", oneDeskId: "" },
+  { id: "t1004", projectId: "p9", title: "LLM model benchmarking", description: "Evaluate 2–3 LLM candidates against gold-standard extraction targets", status: "To Do", priority: "High", assigneeId: "u18", estimateHours: 80, actualHours: 0, startDate: "2026-05-29", dueDate: "2026-06-11", oneDeskId: "" },
+  { id: "t1005", projectId: "p9", title: "PoC demo to stakeholders", description: "Demonstrate extraction accuracy on 5 core document types", status: "To Do", priority: "Medium", assigneeId: "u7", estimateHours: 40, actualHours: 0, startDate: "2026-06-05", dueDate: "2026-06-11", oneDeskId: "" },
+  // Phase 2: Core Engine Development (2026-06-12 → 2026-08-06)
+  { id: "t1006", projectId: "p9", title: "Document Ingestion Service", description: "Build upload normalisation, format handling, routing pipeline", status: "To Do", priority: "High", assigneeId: "u2", estimateHours: 80, actualHours: 0, startDate: "2026-06-12", dueDate: "2026-06-25", oneDeskId: "" },
+  { id: "t1007", projectId: "p9", title: "Document Classification Engine", description: "Train/configure LLM-based document type classifier for 24 types", status: "To Do", priority: "High", assigneeId: "u14", estimateHours: 80, actualHours: 0, startDate: "2026-06-26", dueDate: "2026-07-09", oneDeskId: "" },
+  { id: "t1008", projectId: "p9", title: "LLM Extraction Engine (Tier 1)", description: "Build extraction for core docs: Contract of Sale, Trust Deeds, Payslips, Tax Returns, ID Documents", status: "To Do", priority: "High", assigneeId: "u9", estimateHours: 160, actualHours: 0, startDate: "2026-06-26", dueDate: "2026-07-23", oneDeskId: "" },
+  { id: "t1009", projectId: "p9", title: "LLM Extraction Engine (Tier 2)", description: "Extend extraction to remaining docs: Bank Statements, Valuations, Credit Reports, CMA, Rental, BAS", status: "To Do", priority: "High", assigneeId: "u21", estimateHours: 160, actualHours: 0, startDate: "2026-07-10", dueDate: "2026-08-06", oneDeskId: "" },
+  { id: "t1010", projectId: "p9", title: "Word Search / Risk Flagging", description: "Implement keyword detection for Valuations (28 risk terms), Bank Statements (12 terms), Home Loan Statements (21 terms)", status: "To Do", priority: "High", assigneeId: "u6", estimateHours: 80, actualHours: 0, startDate: "2026-07-10", dueDate: "2026-07-23", oneDeskId: "" },
+  { id: "t1011", projectId: "p9", title: "Field Mapping Service", description: "Build JSON-to-UI field mapping with multi-applicant logic", status: "To Do", priority: "High", assigneeId: "u16", estimateHours: 120, actualHours: 0, startDate: "2026-07-17", dueDate: "2026-08-06", oneDeskId: "" },
+  // Phase 3: UI Integration (2026-08-07 → 2026-09-03)
+  { id: "t1012", projectId: "p9", title: "Enhanced Doc Upload UI", description: "Drag-and-drop, batch upload, progress indicators, auto-classification preview", status: "To Do", priority: "High", assigneeId: "u11", estimateHours: 80, actualHours: 0, startDate: "2026-08-07", dueDate: "2026-08-20", oneDeskId: "" },
+  { id: "t1013", projectId: "p9", title: "Confidence & Review overlay", description: "Per-field confidence indicators, inline correction, accept/reject controls", status: "To Do", priority: "High", assigneeId: "sh2", estimateHours: 80, actualHours: 0, startDate: "2026-08-07", dueDate: "2026-08-20", oneDeskId: "" },
+  { id: "t1014", projectId: "p9", title: "Field pre-population integration", description: "Wire Field Mapping Service outputs to all 12 DEB SMSF UI sections", status: "To Do", priority: "High", assigneeId: "u19", estimateHours: 80, actualHours: 0, startDate: "2026-08-21", dueDate: "2026-09-03", oneDeskId: "" },
+  { id: "t1015", projectId: "p9", title: "Audit trail UI", description: "Admin-facing audit log view showing AI extraction history per application", status: "To Do", priority: "Medium", assigneeId: "sh3", estimateHours: 40, actualHours: 0, startDate: "2026-08-28", dueDate: "2026-09-03", oneDeskId: "" },
+  // Phase 4: Testing & Validation (2026-09-04 → 2026-10-01)
+  { id: "t1016", projectId: "p9", title: "Unit & integration testing", description: "Automated test suites for each extraction pipeline", status: "To Do", priority: "High", assigneeId: "u4", estimateHours: 80, actualHours: 0, startDate: "2026-09-04", dueDate: "2026-09-17", oneDeskId: "" },
+  { id: "t1017", projectId: "p9", title: "UAT with credit team", description: "Guided testing with Mel's credit team using real-world scenarios", status: "To Do", priority: "High", assigneeId: "u23", estimateHours: 80, actualHours: 0, startDate: "2026-09-18", dueDate: "2026-10-01", oneDeskId: "" },
+  { id: "t1018", projectId: "p9", title: "Performance & load testing", description: "Validate <30s processing SLA under peak concurrent users", status: "To Do", priority: "High", assigneeId: "u8", estimateHours: 40, actualHours: 0, startDate: "2026-09-04", dueDate: "2026-09-10", oneDeskId: "" },
+  { id: "t1019", projectId: "p9", title: "Security & compliance audit", description: "Penetration testing, data sovereignty verification, privacy impact assessment", status: "To Do", priority: "High", assigneeId: "sh1", estimateHours: 40, actualHours: 0, startDate: "2026-09-11", dueDate: "2026-09-17", oneDeskId: "" },
+  // Phase 5: Deployment & Hypercare (2026-10-02 → 2026-10-29)
+  { id: "t1020", projectId: "p9", title: "Staged rollout", description: "Pilot with 10% of brokers, then 50%, then 100% over 3 weeks", status: "To Do", priority: "High", assigneeId: "u13", estimateHours: 120, actualHours: 0, startDate: "2026-10-02", dueDate: "2026-10-22", oneDeskId: "" },
+  { id: "t1021", projectId: "p9", title: "Training delivery", description: "Broker training sessions, credit team power-user training, admin training", status: "To Do", priority: "Medium", assigneeId: "u20", estimateHours: 80, actualHours: 0, startDate: "2026-10-02", dueDate: "2026-10-15", oneDeskId: "" },
+  { id: "t1022", projectId: "p9", title: "Hypercare support", description: "Dedicated support team for first 4 weeks post-launch, daily accuracy monitoring", status: "To Do", priority: "Medium", assigneeId: "u1", estimateHours: 160, actualHours: 0, startDate: "2026-10-02", dueDate: "2026-10-29", oneDeskId: "" },
+  { id: "t1023", projectId: "p9", title: "Post-implementation review", description: "Lessons learned, accuracy metrics, user satisfaction survey, roadmap refinement", status: "To Do", priority: "Low", assigneeId: "u15", estimateHours: 40, actualHours: 0, startDate: "2026-10-23", dueDate: "2026-10-29", oneDeskId: "" },
+  // ── MEzy AI DEB Artefact Project (p10) ────────────────────────────────────
+  // 3.1 Governance
+  { id: "t2001", projectId: "p10", title: "Project Charter", description: "One-page scope confirmation: DEB auto-population from existing MEzy AI JSON output for Josh's priority document types. Signed off by Josh and Ben.", status: "To Do", priority: "High", assigneeId: "u5", estimateHours: 40, actualHours: 0, startDate: "2026-05-01", dueDate: "2026-05-07", oneDeskId: "" },
+  { id: "t2002", projectId: "p10", title: "RACI Matrix", description: "Roles and responsibilities across Rupert (PM), Pat/Khanh (dev), Ben (governance), Josh (business sign-off), credit team (UAT).", status: "To Do", priority: "Medium", assigneeId: "u10", estimateHours: 40, actualHours: 0, startDate: "2026-05-01", dueDate: "2026-05-07", oneDeskId: "" },
+  { id: "t2003", projectId: "p10", title: "Project Schedule", description: "8-week delivery plan with weekly milestones. Earlier delivery encouraged per Peter and Josh.", status: "To Do", priority: "High", assigneeId: "sh2", estimateHours: 40, actualHours: 0, startDate: "2026-05-01", dueDate: "2026-05-07", oneDeskId: "" },
+  { id: "t2004", projectId: "p10", title: "Weekly Status Report", description: "Weekly progress update to Josh and Ben: completed, in progress, blockers, risks.", status: "To Do", priority: "Medium", assigneeId: "u17", estimateHours: 40, actualHours: 0, startDate: "2026-05-01", dueDate: "2026-06-25", oneDeskId: "" },
+  // 3.2 Baseline Documentation (Critical Path)
+  { id: "t2005", projectId: "p10", title: "MEzy AI JSON Schema Spec", description: "Word document containing the current production JSON output schemas for each priority document type. Sourced from the approved MEzy AI Document Spec XLS on the T: drive.", status: "To Do", priority: "High", assigneeId: "u2", estimateHours: 40, actualHours: 0, startDate: "2026-05-01", dueDate: "2026-05-07", oneDeskId: "" },
+  { id: "t2006", projectId: "p10", title: "DEB Journey Field Inventory", description: "Register of all fields on the existing DEB journey webpages, organised by UI section. Field name, field type, and UI location for each.", status: "To Do", priority: "High", assigneeId: "sh1", estimateHours: 40, actualHours: 0, startDate: "2026-05-01", dueDate: "2026-05-07", oneDeskId: "" },
+  { id: "t2007", projectId: "p10", title: "JSON-to-DEB Field Mapping", description: "The core mapping document: each MEzy AI JSON output field mapped to its corresponding DEB journey webpage field. Developers to use Claude to assist.", status: "To Do", priority: "High", assigneeId: "u14", estimateHours: 80, actualHours: 0, startDate: "2026-05-01", dueDate: "2026-05-14", oneDeskId: "" },
+  { id: "t2008", projectId: "p10", title: "Gap Analysis", description: "Any DEB fields not covered by existing MEzy AI JSON output, and any JSON fields with no corresponding DEB field. Identifies what works out of the box and what needs additional handling.", status: "To Do", priority: "High", assigneeId: "u9", estimateHours: 40, actualHours: 0, startDate: "2026-05-08", dueDate: "2026-05-14", oneDeskId: "" },
+  // 3.3 Solution Design
+  { id: "t2009", projectId: "p10", title: "Integration Design", description: "Technical design for how DEB will consume MEzy AI JSON output and auto-populate webpage fields. Covers trigger point, data flow, multi-applicant handling, and field-type conversions.", status: "To Do", priority: "High", assigneeId: "sh3", estimateHours: 40, actualHours: 0, startDate: "2026-05-08", dueDate: "2026-05-14", oneDeskId: "" },
+  { id: "t2010", projectId: "p10", title: "Confidence and Review UX", description: "Design for how auto-populated fields are presented to users: confidence indicators (green/amber/red), inline correction, accept/reject workflow.", status: "To Do", priority: "High", assigneeId: "u6", estimateHours: 80, actualHours: 0, startDate: "2026-05-08", dueDate: "2026-05-21", oneDeskId: "" },
+  { id: "t2011", projectId: "p10", title: "Audit Trail Design", description: "How AI-populated fields are logged: source document, field values, confidence scores, and any manual overrides. Required for lending compliance.", status: "To Do", priority: "High", assigneeId: "u20", estimateHours: 80, actualHours: 0, startDate: "2026-05-08", dueDate: "2026-05-21", oneDeskId: "" },
+  // 3.4 Development Deliverables
+  { id: "t2012", projectId: "p10", title: "Auto-Population Engine", description: "The integration code that reads MEzy AI JSON output and populates the corresponding DEB journey fields for each priority document type.", status: "To Do", priority: "High", assigneeId: "u3", estimateHours: 120, actualHours: 0, startDate: "2026-05-15", dueDate: "2026-06-04", oneDeskId: "" },
+  { id: "t2013", projectId: "p10", title: "Confidence Scoring UI", description: "Front-end implementation of per-field confidence indicators and the review/correction interface for credit officers.", status: "To Do", priority: "High", assigneeId: "u22", estimateHours: 80, actualHours: 0, startDate: "2026-05-22", dueDate: "2026-06-04", oneDeskId: "" },
+  { id: "t2014", projectId: "p10", title: "Audit Trail Module", description: "Back-end logging of all AI-populated fields, source documents, confidence scores, and user corrections.", status: "To Do", priority: "High", assigneeId: "sh4", estimateHours: 80, actualHours: 0, startDate: "2026-05-22", dueDate: "2026-06-04", oneDeskId: "" },
+  { id: "t2015", projectId: "p10", title: "Word Search / Risk Flagging", description: "Keyword detection in valuations, bank statements, and home loan statements (existing MEzy AI risk terms) surfaced in the DEB UI.", status: "To Do", priority: "High", assigneeId: "u8", estimateHours: 80, actualHours: 0, startDate: "2026-05-29", dueDate: "2026-06-11", oneDeskId: "" },
+  // 3.5 Testing and UAT
+  { id: "t2016", projectId: "p10", title: "Test Plan", description: "Test approach for the integration: unit tests for field mapping, integration tests for end-to-end population, and UAT scenarios.", status: "To Do", priority: "Medium", assigneeId: "u11", estimateHours: 40, actualHours: 0, startDate: "2026-05-22", dueDate: "2026-05-28", oneDeskId: "" },
+  { id: "t2017", projectId: "p10", title: "Test Document Set", description: "Anonymised sample documents per priority type for testing extraction-to-population accuracy end to end.", status: "To Do", priority: "Medium", assigneeId: "u15", estimateHours: 120, actualHours: 0, startDate: "2026-05-08", dueDate: "2026-05-28", oneDeskId: "" },
+  { id: "t2018", projectId: "p10", title: "UAT Scripts", description: "Step-by-step test scenarios for the credit team: upload document, verify auto-populated fields, test correction workflow, confirm audit trail.", status: "To Do", priority: "High", assigneeId: "u4", estimateHours: 80, actualHours: 0, startDate: "2026-05-29", dueDate: "2026-06-11", oneDeskId: "" },
+  { id: "t2019", projectId: "p10", title: "UAT Sign-off", description: "Formal sign-off from credit team confirming auto-population meets accuracy and usability requirements for each priority document type.", status: "To Do", priority: "High", assigneeId: "u1", estimateHours: 40, actualHours: 0, startDate: "2026-06-12", dueDate: "2026-06-18", oneDeskId: "" },
+  // 3.6 Deployment & Post-Launch
+  { id: "t2020", projectId: "p10", title: "Deployment Runbook", description: "Step-by-step deployment instructions for releasing the integration to production, including rollback procedures and go/no-go criteria.", status: "To Do", priority: "High", assigneeId: "u16", estimateHours: 80, actualHours: 0, startDate: "2026-06-05", dueDate: "2026-06-18", oneDeskId: "" },
+  { id: "t2021", projectId: "p10", title: "Broker User Guide", description: "End-user documentation covering document upload, auto-population review, confidence indicator interpretation, and correction workflow.", status: "To Do", priority: "Medium", assigneeId: "u23", estimateHours: 80, actualHours: 0, startDate: "2026-05-29", dueDate: "2026-06-11", oneDeskId: "" },
+  { id: "t2022", projectId: "p10", title: "Go-Live Checklist", description: "Pre-launch verification checklist confirming all systems, integrations, and support processes are ready for production rollout.", status: "To Do", priority: "High", assigneeId: "sh2", estimateHours: 40, actualHours: 0, startDate: "2026-06-12", dueDate: "2026-06-18", oneDeskId: "" },
+  { id: "t2023", projectId: "p10", title: "Post-Go-Live Review Report", description: "Summary of hypercare period: accuracy metrics, incident log, user feedback, outstanding issues, and recommended roadmap refinements.", status: "To Do", priority: "Medium", assigneeId: "u7", estimateHours: 40, actualHours: 0, startDate: "2026-06-19", dueDate: "2026-06-25", oneDeskId: "" },
 ];
 
 export const MOCK_ACTIVITIES: ActivityLog[] = [
