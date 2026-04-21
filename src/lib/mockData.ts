@@ -205,7 +205,7 @@ export const MOCK_PROJECTS: Project[] = [
   },
   {
     id: "p9",
-    name: "DEB Source",
+    name: "LLM Integration",
     description: "LLM Integration into DEB SMSF Platform. Intelligent Document Analysis & Auto-Population Engine",
     status: "Active",
     estimateSource: "TASK",
