@@ -627,7 +627,7 @@ export default function ProjectDetails() {
             const dayWidth = 22;
 
             return (
-              <div className="flex flex-col h-full bg-surface">
+              <div className="flex flex-col bg-surface">
                 <div className="flex justify-between items-center p-4 border-b border-border-color shrink-0">
                   <h4 className="font-semibold text-text-primary flex items-center gap-2">
                     <BarChart2 className="w-5 h-5 text-primary" />
@@ -655,17 +655,17 @@ export default function ProjectDetails() {
                     </button>
                   </div>
                 </div>
-                <div className="flex flex-1 overflow-auto relative min-h-[400px]">
+                <div className="flex overflow-auto relative items-start">
                   {/* Left Sidebar Table */}
-                  <div className="w-[520px] shrink-0 border-r border-border-color bg-surface sticky left-0 z-20 flex flex-col shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
-                    <div className="h-10 shrink-0 border-b border-border-color flex items-center px-4 font-bold text-[11px] text-text-secondary bg-page-bg uppercase tracking-wider relative">
+                  <div className="w-[520px] shrink-0 border-r border-border-color bg-surface sticky left-0 z-20 flex flex-col shadow-[2px_0_10px_rgba(0,0,0,0.02)]" style={{ height: 40 + flatTasks.length * 40 }}>
+                    <div className="h-10 shrink-0 border-b border-border-color flex items-center px-4 font-bold text-[11px] text-text-secondary bg-page-bg uppercase tracking-wider sticky top-0 z-30">
                       <div className="w-[230px] shrink-0">Task Name</div>
                       <div className="w-[90px] shrink-0">Status</div>
                       <div className="w-[60px] shrink-0">Start</div>
                       <div className="w-[60px] shrink-0">End</div>
                       <div className="w-[40px] shrink-0 text-center">Edit</div>
                     </div>
-                    <div className="flex flex-col flex-1 pb-10">
+                    <div className="flex flex-col flex-1">
                       {flatTasks.map(t => (
                         <div key={t.id} className={`h-10 shrink-0 border-b border-border-color flex items-center px-4 hover:bg-page-bg/50 transition-colors ${t.depth === 0 ? 'bg-page-bg/20' : ''}`}>
                           <div className="w-[230px] shrink-0 flex items-center pr-2" style={{ paddingLeft: t.depth * 16 }}>
@@ -719,7 +719,7 @@ export default function ProjectDetails() {
                   </div>
 
                   {/* Right Timeline */}
-                  <div className="flex-1 overflow-auto relative bg-page-bg/30">
+                  <div className="relative bg-page-bg/30 shrink-0 z-0 self-start" style={{ width: days * dayWidth }}>
                     <div className="flex h-10 shrink-0 border-b border-border-color bg-page-bg min-w-max sticky top-0 z-10">
                       {Array.from({ length: days }).map((_, i) => {
                          const d = new Date(ganttStart.getTime() + i * 24 * 60 * 60 * 1000);
@@ -732,7 +732,7 @@ export default function ProjectDetails() {
                          );
                       })}
                     </div>
-                    <div className="relative min-w-max pb-10" style={{ height: Math.max(400, flatTasks.length * 40 + 40), width: days * dayWidth }}>
+                    <div className="relative min-w-max" style={{ height: flatTasks.length * 40, width: days * dayWidth }}>
                       {/* Grid backgrounds */}
                       <div className="absolute inset-0 flex pointer-events-none">
                         {Array.from({ length: days }).map((_, i) => {
