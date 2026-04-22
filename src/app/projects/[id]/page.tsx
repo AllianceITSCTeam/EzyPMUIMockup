@@ -623,7 +623,7 @@ export default function ProjectDetails() {
             const dayWidth = 22;
 
             return (
-              <div className="flex flex-col bg-surface">
+              <div className="h-full flex flex-col bg-surface">
                 <div className="flex justify-between items-center p-4 border-b border-border-color shrink-0">
                   <h4 className="font-semibold text-text-primary flex items-center gap-2">
                     <BarChart2 className="w-5 h-5 text-primary" />
@@ -651,7 +651,7 @@ export default function ProjectDetails() {
                     </button>
                   </div>
                 </div>
-                <div className="flex overflow-auto relative items-start">
+                <div className="flex flex-1 overflow-auto relative items-start min-h-0">
                   {/* Left Sidebar Table */}
                   <div className="w-[520px] shrink-0 border-r border-border-color bg-surface sticky left-0 z-20 flex flex-col shadow-[2px_0_10px_rgba(0,0,0,0.02)]" style={{ height: 40 + flatTasks.length * 40 }}>
                     <div className="h-10 shrink-0 border-b border-border-color flex items-center px-4 font-bold text-[11px] text-text-secondary bg-page-bg uppercase tracking-wider sticky top-0 z-30">
